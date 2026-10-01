@@ -1,0 +1,488 @@
+<title>Saathi Blueprint</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a single reading column (~70ch) with wide breakouts for tables, diagrams and the calculator; a sticky section index on wide screens. */
+:root{
+  --bg:#F6F8F7; --surface:#FFFFFF; --ink:#13201E; --muted:#56635F; --line:#D5DEDA;
+  --accent:#0E6B62;      /* peacock teal */
+  --accent-soft:#E1F0EC;
+  --marigold:#B87A00;    /* used for "India" call-outs */
+  --marigold-soft:#FBF0D6;
+  --good:#1E7A3E; --warn:#9A6400; --bad:#B3261E;
+  --good-soft:#E2F3E7; --warn-soft:#FBEFD9; --bad-soft:#FBE4E2;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --mono:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --measure:70ch;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1615; --surface:#162120; --ink:#E4ECE9; --muted:#9AA9A4; --line:#2A3836;
+    --accent:#4FC2B3; --accent-soft:#183531; --marigold:#F0B53A; --marigold-soft:#33290F;
+    --good:#6BCB8B; --warn:#F0B53A; --bad:#F2867E; --good-soft:#16301F; --warn-soft:#33290F; --bad-soft:#3A1A18;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1615; --surface:#162120; --ink:#E4ECE9; --muted:#9AA9A4; --line:#2A3836;
+  --accent:#4FC2B3; --accent-soft:#183531; --marigold:#F0B53A; --marigold-soft:#33290F;
+  --good:#6BCB8B; --warn:#F0B53A; --bad:#F2867E; --good-soft:#16301F; --warn-soft:#33290F; --bad-soft:#3A1A18;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;padding-inline:16px;padding-block:0 64px}
+.wrap{max-width:1120px;margin:0 auto;display:grid;grid-template-columns:200px minmax(0,1fr);gap:48px}
+@media (max-width:900px){.wrap{grid-template-columns:minmax(0,1fr);gap:0}.toc{display:none}}
+.toc{position:sticky;top:calc(env(safe-area-inset-top,0px) + 24px);align-self:start;padding-top:40px;font-family:var(--display);font-size:13px}
+.toc a{display:block;color:var(--muted);text-decoration:none;padding:4px 0;border-left:2px solid var(--line);padding-left:10px}
+.toc a:hover,.toc a:focus-visible{color:var(--accent);border-color:var(--accent)}
+main{min-width:0}
+header.hero{padding-block:40px 24px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(2.2rem,5vw,3.4rem);line-height:1.05;margin:.3em 0 .35em;text-wrap:balance;letter-spacing:-.01em}
+h1 em{font-style:normal;color:var(--accent)}
+.lede{font-size:1.18rem;max-width:var(--measure);color:var(--ink)}
+.meta{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:16px}
+section{padding-block:40px 8px;border-bottom:1px solid var(--line)}
+h2{font-family:var(--display);font-weight:700;font-size:1.75rem;line-height:1.15;margin:0 0 .6em;text-wrap:balance}
+h3{font-family:var(--display);font-weight:700;font-size:1.15rem;margin:1.4em 0 .4em}
+p,ul,ol{max-width:var(--measure)}
+li{margin:.25em 0}
+a{color:var(--accent)}
+strong{font-weight:600}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.callout{background:var(--marigold-soft);border:1px solid color-mix(in srgb,var(--marigold) 35%,transparent);border-radius:8px;padding:14px 18px;max-width:var(--measure);margin:16px 0}
+.callout .tag{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--marigold);display:block;margin-bottom:4px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:20px 0}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px}
+.stat b{display:block;font-family:var(--display);font-size:1.6rem;font-weight:700;line-height:1.1}
+.stat span{font-size:13px;color:var(--muted);font-family:var(--display)}
+.tablewrap{overflow-x:auto;margin:16px 0;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:14.5px;font-family:var(--display)}
+th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--line)}
+th{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;background:var(--bg)}
+tr:last-child td{border-bottom:0}
+td.r,th.r{text-align:right;font-variant-numeric:tabular-nums}
+.pill{display:inline-block;font-family:var(--mono);font-size:11px;padding:2px 8px;border-radius:99px;white-space:nowrap}
+.p-hi{background:var(--bad-soft);color:var(--bad)}
+.p-md{background:var(--warn-soft);color:var(--warn)}
+.p-lo{background:var(--good-soft);color:var(--good)}
+.moves{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin:18px 0}
+.move{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px 18px;min-width:0}
+.move h4{font-family:var(--display);font-size:1.02rem;margin:0 0 6px}
+.move p{font-size:15px;margin:0}
+.move .vs{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-top:10px;display:block}
+pre.mermaid{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px;overflow-x:auto;font-family:var(--mono);font-size:13px}
+/* calculator */
+.calc{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;margin:18px 0}
+.presets{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.presets button{font-family:var(--display);font-size:13.5px;border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:7px 12px;border-radius:99px;cursor:pointer}
+.presets button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+.presets button:focus-visible,.calc input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.calc-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:24px}
+@media (max-width:760px){.calc-grid{grid-template-columns:minmax(0,1fr)}}
+fieldset{border:0;padding:0;margin:0 0 14px}
+legend{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+.field{display:grid;grid-template-columns:minmax(0,1fr) 110px;gap:10px;align-items:center;padding:4px 0;font-family:var(--display);font-size:14px}
+.field input{width:100%;font-family:var(--mono);font-size:14px;padding:5px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);text-align:right}
+.out{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);align-self:start;display:grid;gap:10px}
+.out .big{background:var(--bg);border-radius:8px;padding:14px;border:1px solid var(--line)}
+.out .big b{display:block;font-family:var(--display);font-size:1.7rem;font-variant-numeric:tabular-nums}
+.out .big span{font-family:var(--display);font-size:12.5px;color:var(--muted)}
+.out .pos b{color:var(--good)} .out .neg b{color:var(--bad)}
+.bar{display:flex;height:14px;border-radius:4px;overflow:hidden;background:var(--line);margin:6px 0 4px}
+.bar i{display:block;height:100%}
+.legend{display:flex;flex-wrap:wrap;gap:4px 12px;font-family:var(--display);font-size:12px;color:var(--muted)}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:4px;vertical-align:middle}
+.breakdown{font-family:var(--display);font-size:13.5px;width:100%}
+.breakdown td{padding:3px 0;border:0}
+.note{font-size:13.5px;color:var(--muted);font-family:var(--display)}
+.sources{font-family:var(--display);font-size:13.5px}
+.sources li{margin:.35em 0;word-break:break-word}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+<nav class="toc" aria-label="Sections">
+  <a href="#instinct">How Instinct works</a>
+  <a href="#weak">Where it's weak</a>
+  <a href="#competition">Competition</a>
+  <a href="#saathi">The India play</a>
+  <a href="#scope">Scope &amp; roadmap</a>
+  <a href="#arch">Architecture</a>
+  <a href="#economics">Unit economics</a>
+  <a href="#revenue">Revenue model</a>
+  <a href="#risks">Risks</a>
+  <a href="#next">Next 30 days</a>
+  <a href="#sources">Sources</a>
+</nav>
+
+<main>
+<header class="hero">
+  <div class="eyebrow">Strategy blueprint · India · October 2026</div>
+  <h1>Instinct for Bharat: <em>call it, text it, it gets done</em></h1>
+  <p class="lede">Instinct proved that people will hand errands to an AI agent that texts like a friend. It is US-only, invite-only, burns compute running a cloud computer per user, and has privacy problems. This blueprint designs an Indian version, working name <strong>Saathi</strong>. It is built on India's own rails (UPI, ONDC, BBPS, DigiLocker, merchant MCPs) and on voice calls in Indian languages. Human runners cover the jobs India needs most and Instinct never planned for: sarkari paperwork, refund chasing, and looking after parents from afar.</p>
+  <div class="meta">Working name only. Figures marked "reported" come from press coverage. Figures marked "assumption" are mine; change them in the calculator.</div>
+</header>
+
+<section id="instinct">
+  <h2>How Instinct works</h2>
+  <p>Instinct is built by Spear Street Technology in San Francisco, founded in 2025 by Noah Shinn (23, ex-Sierra). You text it on iMessage or WhatsApp, or call it. It works through your connected email, calendar, messages, screen, location, stored credentials and payment details. It does the work on <strong>its own cloud phone and computer</strong>, using apps and websites the way a person would. It books travel, orders groceries, checks you into flights, makes reservations and follows up on threads you dropped.</p>
+
+  <div class="stats">
+    <div class="stat"><b class="num">$10B</b><span>valuation after $1B Series C, Sept 2026 (reported)</span></div>
+    <div class="stat"><b class="num">100k+</b><span>users, invite-only, capped by compute (reported)</span></div>
+    <div class="stat"><b class="num">~$1B</b><span>annualised transaction volume, ~50% travel (reported)</span></div>
+    <div class="stat"><b class="num">$1,300</b><span>avg monthly spend via Instinct among users who buy (reported)</span></div>
+    <div class="stat"><b class="num">~10%/day</b><span>user growth, zero marketing, 14-person team (reported)</span></div>
+  </div>
+
+  <h3>Funding path</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Round</th><th class="r">Raised</th><th class="r">Valuation</th><th>Lead / notable</th></tr></thead>
+    <tbody>
+      <tr><td>Seed</td><td class="r">—</td><td class="r num">$50M</td><td>Conviction, Greenoaks</td></tr>
+      <tr><td>Series A (early Aug 2026)</td><td class="r num">$75M</td><td class="r num">$500M</td><td>Kleiner Perkins</td></tr>
+      <tr><td>Series B (26 Aug 2026)</td><td class="r num">$250M</td><td class="r num">$2.5B</td><td>Index Ventures, Benchmark</td></tr>
+      <tr><td>Series C (28 Sep 2026)</td><td class="r num">$1B</td><td class="r num">$10B</td><td>Sequoia, Benchmark, Coatue</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>How it plans to make money</h3>
+  <ul>
+    <li><strong>Free to users.</strong> Shinn has said he wants to deliver it "for free to everyone for a lifetime." He has explicitly rejected ads.</li>
+    <li><strong>Merchant commission, like Apple Pay.</strong> Merchants pay for delivered customers. Shinn cites boutique hotels paying up to 30% per booking. Travel is half of volume, so this is the core engine.</li>
+    <li><strong>Instinct Concierge</strong> (17 Sep 2026): a "white-glove" layer that places phone calls, for example booking restaurants without online reservations, joining a dentist's cancellation list, or fixing a cable bill. It is in early access. Meta Muse shipped calling the same day.</li>
+    <li><strong>Instinct Selections</strong> (late Sep 2026): human-curated lists for dining, travel and shopping from "local chefs, designers, travel guides." Users pushed back on unsolicited suggestions for luggage, sunglasses and hats. Whether these are monetised has not been disclosed.</li>
+    <li><strong>Possible paid tiers.</strong> Third-party reports estimate $200–500 a month tied to cloud-desktop compute. Its terms reserve the right to charge.</li>
+  </ul>
+  <p>Most of the new money goes to compute. Shinn reportedly spends about 40% of his time securing it. That is the price of the cloud computer per user design.</p>
+</section>
+
+<section id="weak">
+  <h2>Where Instinct is weak, and why India is different</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Instinct weakness</th><th>What it means</th><th>India opening</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Compute cost</strong>: every task drives a full cloud phone or computer</td><td>Invite-only rollout, heavy capital needs, $200–500/mo tiers floated</td><td>India has structured rails (UPI, ONDC, BBPS, DigiLocker, Account Aggregator, Swiggy MCP). Most tasks can go through cheap APIs, with screen automation only as a fallback.</td></tr>
+      <tr><td><strong>Privacy record</strong>: inbox data kept after disconnect, a successful prompt-injection test, an email sent without approval, broad perpetual-licence terms</td><td>Trust is fragile in this category</td><td>Under the DPDP Act, consent managers arrive Nov 2026 and full obligations May 2027. Make "delete means delete" and per-task consent the product, not a footnote.</td></tr>
+      <tr><td><strong>US-shaped jobs</strong>: travel, restaurants, cable bills</td><td>Built for high-income US users who spend $1,300/mo through it</td><td>India's painful jobs are different: Aadhaar/PAN fixes, passport and RTO slots, refunds, insurance claims, gas, electricity disputes, Tatkal tickets, and parents' errands.</td></tr>
+      <tr><td><strong>Text-first, English</strong></td><td>Works for iPhone users who are good typists</td><td>India runs on phone calls and voice notes in 22 languages. Hundreds of millions are more at ease talking than typing.</td></tr>
+      <tr><td><strong>Ads-like recommendations</strong> (the Selections backlash)</td><td>Commission incentives leak into suggestions</td><td>Show the commission on every suggestion and never push one unasked. That becomes a brand promise.</td></tr>
+      <tr><td><strong>Not available in India</strong>; Meta Muse is also US/Canada only</td><td>No well-funded agent on the ground yet</td><td>A 6–12 month window, until Muse or Instinct localise.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout"><span class="tag">Critical constraint: WhatsApp, cross-checked</span>
+    <p style="margin:0 0 8px"><strong>The rule.</strong> Since 15 Jan 2026 (15 Oct 2025 for new accounts), the WhatsApp Business Solution terms bar "AI Providers" when a general-purpose assistant is the "primary (rather than incidental or ancillary) functionality." ChatGPT, Copilot, Perplexity, Luzia and Poke were removed. Bots for bookings, orders, support and notifications are allowed. Regulators forced exceptions only in <strong>Italy, Brazil and the EU</strong>: the EU ordered free access restored on 9 Jun 2026 and ChatGPT returned in the EEA on 13 Jul 2026. <strong>No regulator has acted in India</strong>, so the ban applies here.</p>
+    <p style="margin:0 0 8px"><strong>What Instinct actually does.</strong> A real chat with Instinct's number shows "Business Account" and "This business is now using a secure service from Meta to manage this chat." That is Meta's official Cloud API. An unlinked number gets a link to <span class="num">app.instinct.com/whatsapp-onboarding</span> to sign up. So Instinct uses WhatsApp as its <em>front door</em>, with the account, connections and payments on its own web app. It has not been blocked as of Sept 2026. Our reading, which is unconfirmed: Instinct either presents itself as an errand and booking service where AI is how it delivers (the "ancillary" side of the rule), or Meta hasn't enforced against it yet. Poke, a very similar agent, was cut off, and Instinct competes head-on with Meta's own Muse, so this is a live platform risk for Instinct too.</p>
+    <p style="margin:0"><strong>What Saathi should do.</strong> Use the WhatsApp Cloud API the same way: an errand service with structured flows (task confirmation, quotes, UPI payment links, status updates, receipts) and the account on our app. Don't market it as "ChatGPT on WhatsApp." User-started service chats are free, so WhatsApp is the cheapest channel in India. But <strong>never depend on it alone</strong>: run the phone number, Android app and RCS in parallel from day one so a WhatsApp cut-off is an inconvenience, not the end of the company. Get a written policy opinion from a Meta Business Solution Provider before launch.</p>
+  </div>
+</section>
+
+<section id="competition">
+  <h2>Competition map</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Player</th><th>What it is</th><th>In India?</th><th>Price</th><th>Threat</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Instinct</strong></td><td>Text/call agent with its own cloud computer; Concierge calling</td><td>No (US, invite-only)</td><td>Free today</td><td><span class="pill p-md">Medium, later high</span></td></tr>
+      <tr><td><strong>Meta Muse</strong></td><td>Agent in WhatsApp, web and app; forms, purchases, calls</td><td>No (US + Canada)</td><td>Free / $20 / $100</td><td><span class="pill p-hi">High: owns WhatsApp</span></td></tr>
+      <tr><td><strong>ChatGPT</strong> (Go free in India; agent; UPI agentic pilot)</td><td>Chat plus agent mode; Swiggy and other merchant apps via MCP; NPCI/Razorpay UPI pilot</td><td>Yes. ~73M DAU in India</td><td>Go free for 12 months (sign-up open to 16 Dec 2026)</td><td><span class="pill p-hi">High</span></td></tr>
+      <tr><td><strong>Gemini</strong> (via Jio)</td><td>Assistant with Android/Google integration</td><td>Yes. Pro free 18 months for Jio 5G users</td><td>Free via Jio</td><td><span class="pill p-hi">High</span></td></tr>
+      <tr><td><strong>Claude</strong></td><td>Assistant; Razorpay/NPCI UPI agentic payments pilot with Zomato, Swiggy, Zepto</td><td>Yes</td><td>Paid tiers</td><td><span class="pill p-md">Medium</span></td></tr>
+      <tr><td><strong>Kruti</strong> (Ola Krutrim)</td><td>Agentic assistant: cabs, food, bill pay, 13 Indian languages, ONDC + Ola integration</td><td>Yes</td><td>Free</td><td><span class="pill p-md">Medium: shows demand, weak on trust and monetisation</span></td></tr>
+      <tr><td><strong>Meta AI</strong> on WhatsApp</td><td>Chat assistant; Business AI for Indian SMEs</td><td>Yes</td><td>Free</td><td><span class="pill p-md">Medium</span></td></tr>
+      <tr><td><strong>Town</strong>, Poke (now Cognition), Manus, OpenClaw, Vellum</td><td>Prosumer/work agents, open-source self-hosted agents</td><td>Mostly global, English</td><td>Varies</td><td><span class="pill p-lo">Low for mass India</span></td></tr>
+      <tr><td><strong>Vertical apps</strong>: MakeMyTrip, Swiggy, Zepto, PhonePe, Paytm, Urban Company</td><td>Own the supply; adding AI to their own apps</td><td>Yes</td><td>—</td><td><span class="pill p-md">Partners more than rivals</span></td></tr>
+      <tr><td><strong>B2B voice-AI</strong>: Sarvam, Gnani, Ringg, Zoice, Haptik</td><td>Indic speech and voice bots for enterprises</td><td>Yes</td><td>Per minute</td><td><span class="pill p-lo">Suppliers</span></td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>What this shows:</strong> the big chat assistants will be free and very good at answering, and through MCP they can already order food. None of them will call your electricity board in Marathi, fight your airline refund for three weeks, or book your father's cardiologist from Dubai. The opening is in <strong>persistence, phone calls and human follow-through</strong>, not in chat quality.</p>
+</section>
+
+<section id="saathi">
+  <h2>The India play: seven ways to beat them</h2>
+  <p><strong>Positioning:</strong> <em>"Saathi gets it done, even when it takes ten phone calls and two weeks."</em> Instinct is a concierge for affluent Americans. Saathi is a <strong>persistent fixer</strong> for Indian families.</p>
+  <div class="moves">
+    <div class="move"><h4>1. WhatsApp plus voice, with no single point of failure</h4><p>WhatsApp is the front door, as it is for Instinct: voice notes in Hindi, Tamil, Bengali and more, with structured confirmations and UPI links. The same phone number also takes calls, so parents can use it without an app. The Android app and RCS mirror everything in case Meta enforces its AI-provider rule.</p><span class="vs">vs Instinct: English text, one platform risk</span></div>
+    <div class="move"><h4>2. API-first task router</h4><p>Route each task to the cheapest path that works: merchant MCP/API, then ONDC/BBPS/UPI, then browser automation, then an outbound call, then a human runner. Most Indian tasks never need a cloud computer.</p><span class="vs">vs Instinct: a cloud computer for everything, compute-capped</span></div>
+    <div class="move"><h4>3. The "sarkari and refunds" desk</h4><p>Chase airline and e-commerce refunds, insurance claims, electricity and telecom complaints, passport, RTO and Aadhaar appointments. Charge a <strong>success fee</strong>: pay only when the money or slot arrives.</p><span class="vs">vs Instinct: travel and restaurants</span></div>
+    <div class="move"><h4>4. Abroad plan for NRIs looking after parents</h4><p>About 18M Indians abroad worry about parents at home. "Book Papa's blood test, pay the society bill, send a plumber." Priced in USD, with human runners for physical errands.</p><span class="vs">The highest-ARPU segment and nobody owns it</span></div>
+    <div class="move"><h4>5. UPI Reserve Pay, not stored cards</h4><p>Use NPCI's agentic UPI (Reserve Pay mandates with per-merchant caps that can be revoked instantly). Saathi never holds card numbers or passwords.</p><span class="vs">vs Instinct: stored credentials and payments</span></div>
+    <div class="move"><h4>6. Privacy you can see</h4><p>Ask permission per task, show a readable action log, and when you disconnect, delete everything (with proof). Be DPDP-ready before the May 2027 deadline and integrate a registered consent manager.</p><span class="vs">vs Instinct: kept data after disconnect, perpetual-licence terms</span></div>
+    <div class="move"><h4>7. Honest commissions</h4><p>Every suggestion shows "Saathi earns ₹X from this" and a cheaper option if one exists. Recommendations only when asked. Indian users are sceptical of deals, and transparency builds word of mouth.</p><span class="vs">vs Instinct: the Selections backlash</span></div>
+  </div>
+</section>
+
+<section id="scope">
+  <h2>Scope and roadmap</h2>
+  <h3>Launch use cases, ranked by pain and feasibility</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Job</th><th>Route</th><th>How we earn</th><th>Phase</th></tr></thead>
+    <tbody>
+      <tr><td>Food, grocery, quick commerce orders</td><td>Swiggy MCP, ONDC buyer app, Zepto/Zomato via UPI agentic</td><td>ONDC buyer-app fee; retention driver</td><td>MVP</td></tr>
+      <tr><td>Bill payments and autopay guard (electricity, gas, DTH, FASTag, postpaid)</td><td>BBPS via a licensed partner</td><td>Small per-bill fee; daily habit</td><td>MVP</td></tr>
+      <tr><td>Calls to businesses: doctor slots, restaurant tables, service centres, landlords</td><td>Outbound AI voice (Indic STT/TTS), transcript sent to user</td><td>Subscription; premium call minutes</td><td>MVP</td></tr>
+      <tr><td>Refund and complaint chasing (airlines, e-commerce, telecom, banks)</td><td>Email, portal and calls, with human escalation; consumer helpline / grievance-officer escalation</td><td>Success fee: 10% of amount recovered, capped</td><td>MVP</td></tr>
+      <tr><td>Trains, flights, buses, hotels</td><td>IRCTC authorised agent / OTA APIs; direct hotel deals</td><td>Commission 2–15%</td><td>Phase 2</td></tr>
+      <tr><td>Government paperwork: passport, PAN/Aadhaar updates, RTO, certificates</td><td>Guided flows, DigiLocker, slot monitoring, human runner for documents</td><td>Per-task fee ₹99–499</td><td>Phase 2</td></tr>
+      <tr><td>Home services: plumber, cleaning, repairs, pest control</td><td>Urban Company and local vendors; WhatsApp structured bookings</td><td>Lead / booking commission</td><td>Phase 2</td></tr>
+      <tr><td>Insurance renewals and claims follow-up</td><td>Partner with an IRDAI-licensed broker; Account Aggregator for context</td><td>Broker revenue share (regulated)</td><td>Phase 3</td></tr>
+      <tr><td>"Agent-ready" listings for SMBs</td><td>Merchants list slots, menus and prices so Saathi can book them</td><td>SaaS + per-booking fee</td><td>Phase 3</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Roadmap</h3>
+  <ol>
+    <li><strong>Days 0–90 (MVP, one city, Hindi + English):</strong> WhatsApp Cloud API front door (structured flows) plus a phone number and Android app, voice notes in and calls out, the four MVP jobs above, a human ops desk of 5–8 people, UPI collect/intent payments. Closed beta of about 2,000 users through referrals. Target 70% of tasks fully automated and a measured cost per task.</li>
+    <li><strong>Months 4–9 (Phase 2):</strong> 6 more languages, travel and the sarkari desk, UPI Reserve Pay mandates once NPCI's Unified Agent Protocol opens, Family and Abroad plans, Bengaluru, Delhi NCR, Mumbai and Pune.</li>
+    <li><strong>Months 10–18 (Phase 3):</strong> SMB "agent-ready" network, insurance and finance partners, B2B API so banks and telcos can white-label Saathi, Tier-2 cities.</li>
+  </ol>
+</section>
+
+<section id="arch">
+  <h2>Architecture: the cheapest path that works</h2>
+  <p>The router is the moat. Each step down the ladder is roughly 3–10× more expensive than the one above, so we try them in order and learn which path wins for each merchant and task.</p>
+<pre class="mermaid">
+flowchart TD
+  U["User: WhatsApp, phone call, voice note, app, RCS"] --> I["Intent and language<br/>Indic STT + LLM planner"]
+  I --> C{"Consent check<br/>per-task permission + spend cap"}
+  C --> R{"Task router"}
+  R -->|"1. cheapest"| A["Merchant MCP / API<br/>Swiggy, OTAs, Urban Company"]
+  R -->|"2"| G["Public rails<br/>ONDC, BBPS, UPI Reserve Pay, DigiLocker"]
+  R -->|"3"| B["Browser automation<br/>sandboxed, per task"]
+  R -->|"4"| V["Outbound AI call<br/>DLT-registered number"]
+  R -->|"5. costliest"| H["Human runner desk"]
+  A --> L["Action log + receipt<br/>to user"]
+  G --> L
+  B --> L
+  V --> L
+  H --> L
+  L --> M["Memory with user control<br/>delete = delete"]
+</pre>
+  <p class="note">Model choice: a fast, cheap model for intent, routing and summaries; a stronger model only for planning, browser steps and negotiation calls. Cache prompts heavily, since most tasks repeat the same tool schemas.</p>
+</section>
+
+<section id="economics">
+  <h2>Unit economics calculator</h2>
+  <p>Every number is an editable assumption, monthly, in rupees. Try the presets. <strong>"Instinct-style"</strong> shows why running a cloud computer for every task for free does not work at Indian price points. <strong>"Saathi launch"</strong> and <strong>"Saathi at scale"</strong> show how API-first routing, a paid tier and success fees move the margin.</p>
+
+  <div class="calc" id="calc">
+    <div class="presets" role="group" aria-label="Scenario presets">
+      <button type="button" data-preset="instinct" aria-pressed="false">Instinct-style in India</button>
+      <button type="button" data-preset="launch" aria-pressed="true">Saathi launch</button>
+      <button type="button" data-preset="scale" aria-pressed="false">Saathi at scale</button>
+    </div>
+    <div class="calc-grid">
+      <div id="inputs"></div>
+      <div class="out" aria-live="polite">
+        <div class="big" id="o-margin"><b>—</b><span>Contribution margin per MAU / month</span></div>
+        <div class="big"><b id="o-rev">—</b><span>Revenue per MAU / month</span></div>
+        <div class="big"><b id="o-cost">—</b><span>Variable cost per MAU / month</span></div>
+        <div>
+          <div class="note">Revenue mix</div>
+          <div class="bar" id="bar-rev"></div>
+          <div class="legend" id="leg-rev"></div>
+        </div>
+        <div>
+          <div class="note">Cost mix</div>
+          <div class="bar" id="bar-cost"></div>
+          <div class="legend" id="leg-cost"></div>
+        </div>
+        <table class="breakdown"><tbody id="o-totals"></tbody></table>
+      </div>
+    </div>
+  </div>
+  <p class="note">Cost anchors: Sarvam speech-to-text ₹30/hour and text-to-speech ₹15–30 per 10k characters, so voice runs about ₹1.5/min before LLM and telephony. WhatsApp utility templates cost ₹0.115 each and replies inside the 24-hour window are free. MakeMyTrip affiliate pays only ₹112 per domestic hotel, so travel margin needs direct supplier deals. LLM cost per task is my estimate for a routed, cached model mix; measure it in the beta.</p>
+</section>
+
+<section id="revenue">
+  <h2>Revenue model</h2>
+  <p>India will not pay $200 a month, and free AI is everywhere (ChatGPT Go, Gemini via Jio). So we charge for <strong>outcomes and persistence</strong>, which free chatbots don't deliver, and we never sell ads.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Stream</th><th>Price (proposal)</th><th>Why people pay</th><th>Share of revenue at scale</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Free</strong></td><td class="num">₹0 · 5 tasks/mo</td><td>Habit and referrals; API-routed tasks only</td><td>—</td></tr>
+      <tr><td><strong>Saathi Plus</strong></td><td class="num">₹199/mo · ₹1,999/yr</td><td>40 tasks, calls on your behalf, bill guard, all languages</td><td rowspan="3">35–45%</td></tr>
+      <tr><td><strong>Saathi Family</strong></td><td class="num">₹499/mo</td><td>Up to 4 members including parents, shared permissions</td></tr>
+      <tr><td><strong>Saathi Abroad</strong> (NRI)</td><td class="num">$15/mo (~₹1,299)</td><td>Parents' errands in India with included human-runner hours</td></tr>
+      <tr><td><strong>Success fees</strong></td><td class="num">10% of refund recovered, cap ₹500; ₹99–499 per sarkari task</td><td>Pay only when it works, which matches how Indians already pay agents and CSC centres</td><td>15–25%</td></tr>
+      <tr><td><strong>Merchant commissions</strong></td><td class="num">2–15% by category</td><td>Travel and hotels (direct deals), ONDC, home services; always disclosed to the user</td><td>25–35%</td></tr>
+      <tr><td><strong>B2B / white-label</strong></td><td class="num">Per-task or platform fee</td><td>Banks, telcos and insurers embed Saathi for their customers</td><td>5–15% (later)</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="risks">
+  <h2>Risks and how to handle them</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Risk</th><th>Level</th><th>Mitigation</th></tr></thead>
+    <tbody>
+      <tr><td>Meta enforces the WhatsApp "AI Provider" rule against Saathi (it has against Poke, ChatGPT and Perplexity)</td><td><span class="pill p-hi">High</span></td><td>Position and build as an errand service with structured flows, not open chat. Get a written BSP/policy opinion. Run phone, app and RCS in parallel from day one, and keep users' accounts on our app so we can move them. Watch for a CCI case; the EU and Brazil have already forced Meta to back down.</td></tr>
+      <tr><td>Meta launches Muse in India inside WhatsApp</td><td><span class="pill p-hi">High</span></td><td>Own the voice and sarkari/refund niche and the human desk, which Meta won't staff. Move fast while Muse is absent.</td></tr>
+      <tr><td>ChatGPT and Gemini, free, add UPI agentic checkout</td><td><span class="pill p-hi">High</span></td><td>Don't compete on chat. Compete on multi-day persistence, phone calls, Indic voice and outcomes. Consider building on top of them as a channel through MCP.</td></tr>
+      <tr><td>TRAI rules on automated calls (Third Amendment, 18 Sep 2026)</td><td><span class="pill p-md">Medium</span></td><td>Calls are transactional and made at the user's request. Pre-declare automated calls and register on DLT. Say at the start of every call that it is an AI calling for a named person. Avoid any promotional calling.</td></tr>
+      <tr><td>DPDP Act obligations (consent managers Nov 2026, full rules May 2027)</td><td><span class="pill p-md">Medium</span></td><td>Design for compliance from day one: purpose-limited consent, erasure, breach response, data in India. Turn it into a selling point.</td></tr>
+      <tr><td>Payments regulation (RBI/NPCI) and liability for wrong purchases</td><td><span class="pill p-md">Medium</span></td><td>Use licensed PA/TPAP partners (Razorpay and others). Set spend caps through Reserve Pay. Show a confirmation step above a threshold, and keep a refund guarantee fund.</td></tr>
+      <tr><td>Prompt injection and acting without approval</td><td><span class="pill p-md">Medium</span></td><td>Treat emails and web pages as untrusted data. Require approval for anything that sends, pays or shares. Run browser tasks in sandboxes without stored passwords.</td></tr>
+      <tr><td>Low willingness to pay; compute cost</td><td><span class="pill p-md">Medium</span></td><td>API-first routing, strict free-tier limits, success fees, the NRI segment and annual plans. Watch cost per task every week.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="next">
+  <h2>Next 30 days</h2>
+  <ol>
+    <li><strong>Talk to 50 users</strong> in three groups: NRIs with parents in India, working urban couples, and people aged 50+. Ask about the last five errands that cost them over an hour.</li>
+    <li><strong>Run a "Wizard of Oz" pilot.</strong> A phone number plus 3 people doing tasks by hand with AI help for 200 users. Log every task with time, route and cost.</li>
+    <li><strong>Prototype the router</strong> using Swiggy MCP, a BBPS partner sandbox and Indic STT/TTS, and measure real cost per task for each path.</li>
+    <li><strong>Start partner conversations</strong>: Razorpay (agentic UPI), an ONDC buyer-app network participant, a BBPS operating unit, an IRCTC-authorised agent.</li>
+    <li><strong>Legal groundwork</strong>: DLT registration for outbound calls, a DPDP privacy design review, and a written WhatsApp usage policy that keeps us inside the Business API rules.</li>
+  </ol>
+</section>
+
+<section id="sources">
+  <h2>Sources</h2>
+  <p class="note">instinct.com and several review sites were blocked from this environment, so facts come from search-result summaries of the articles below. Check key figures against the original pieces before using them in a pitch.</p>
+  <ul class="sources">
+    <li><a href="https://techcrunch.com/2026/09/28/viral-ai-agent-instinct-raises-1b-series-c-at-a-10b-valuation/">TechCrunch: Instinct raises $1B Series C at $10B</a></li>
+    <li><a href="https://techcrunch.com/2026/09/17/rival-ai-agents-instinct-and-metas-muse-both-add-the-ability-to-make-calls/">TechCrunch: Instinct and Meta's Muse add calling</a></li>
+    <li><a href="https://techcrunch.com/2026/09/30/instincts-new-product-recommendations-are-giving-some-users-the-ick/">TechCrunch: Instinct Selections backlash</a></li>
+    <li><a href="https://siliconangle.com/2026/09/28/everyday-personal-ai-assistant-startup-instinct-raises-1b-at-10b-valuation/">SiliconANGLE: Instinct raises $1B</a></li>
+    <li><a href="https://www.pymnts.com/news/artificial-intelligence/2026/personal-ai-agent-instinct-quadruples-valuation-to-10-billion-in-1-month/">PYMNTS: valuation quadruples</a></li>
+    <li><a href="https://fortune.com/2026/09/30/noah-shinn-instinct-ai-assistant-meta-muse-alexandr-wang-tech-series-c-ai-agent-mark-zuckerberg/">Fortune: profile of Noah Shinn</a></li>
+    <li><a href="https://skift.com/2026/09/28/instincts-app-is-fueled-by-travel-founder-says-its-half-of-volume/">Skift: travel is half of Instinct's volume</a></li>
+    <li><a href="https://x.com/patrick_oshag/status/2104652976447168787">Patrick O'Shaughnessy: Shinn on keeping Instinct free</a></li>
+    <li><a href="https://finance.yahoo.com/technology/ai/articles/instinct-ai-assistant-raises-250-173454497.html">Yahoo Finance: $250M Series B at $2.5B</a></li>
+    <li><a href="https://www.eesel.ai/blog/instinct-ai-review">eesel: Instinct review</a> · <a href="https://www.eesel.ai/blog/instinct-ai-pricing">pricing</a> · <a href="https://www.eesel.ai/blog/instinct-ai-alternatives">alternatives</a></li>
+    <li><a href="https://gyld.ai/blog/instinct-ai-review-impressive-agent-real-privacy-risks">gyld: privacy risks</a> · <a href="https://www.aisupersmart.com/is-instinct-ai-safe/">AiSuperSmart: terms</a></li>
+    <li><a href="https://www.medianama.com/2026/09/223-meta-muse-personal-ai-agent-india/">MediaNama: Meta Muse launches, India left out</a></li>
+    <li><a href="https://9to5mac.com/2026/01/15/meta-reverses-whatsapp-third-party-chatbot-ban-in-italy-and-brazil/">9to5Mac: Meta reverses ban in Italy and Brazil</a> · <a href="https://memeburn.com/chatgpt-returns-to-whatsapp-in-europe/">Memeburn: ChatGPT returns to WhatsApp in Europe</a> · <a href="https://techcrunch.com/2025/10/18/whatssapp-changes-its-terms-to-bar-general-purpose-chatbots-from-its-platform/">TechCrunch: WhatsApp bars general-purpose chatbots</a></li>
+    <li><a href="https://respond.io/blog/whatsapp-general-purpose-chatbots-ban">respond.io: WhatsApp general-purpose chatbot ban</a> · <a href="https://techcrunch.com/2026/01/13/brazil-orders-meta-to-suspend-policy-banning-third-party-ai-chatbots-from-whatsapp">TechCrunch: Brazil suspends ban</a></li>
+    <li><a href="https://razorpay.com/blog/agentic-payments-and-npci/">Razorpay: agentic UPI payments with NPCI</a> · <a href="https://inc42.com/buzz/npci-to-launch-agentic-payments-on-upi-report/">Inc42: NPCI agentic payments</a></li>
+    <li><a href="https://www.medianama.com/2026/01/223-ordering-chatgpt-swiggy-services-working/">MediaNama: ordering Swiggy through ChatGPT</a></li>
+    <li><a href="https://www.businesstoday.in/amp/tech-today/news/story/kruti-explained-the-ai-assistant-that-books-cabs-orders-food-but-can-it-monetise-480227-2025-06-12">Business Today: Kruti explained</a></li>
+    <li><a href="https://www.croma.com/unboxed/jio-vs-airtel-vs-chatgpt-go">Croma: Jio Gemini vs Airtel Perplexity vs ChatGPT Go</a> · <a href="https://t2online.in/tech/deep-dive/india-is-hooked-to-free-ai--what-s-the-hidden-cost-of-chatbots-/2002487">t2: India hooked on free AI</a></li>
+    <li><a href="https://baat.ai/blog/whatsapp-api-pricing-india">WhatsApp API pricing in India 2026</a></li>
+    <li><a href="https://sarvam.ai/api-pricing">Sarvam AI API pricing</a></li>
+    <li><a href="https://www.mondaq.com/dpdp-act-and-rules-2025-the-2026-compliance-milestones-businesses-cant-afford-to-miss/1830402">Mondaq: DPDP 2026 milestones</a></li>
+    <li><a href="https://telanganatoday.com/trai-tightens-anti-spam-rules-brings-ai-detection-and-robocalls-under-framework">Telangana Today: TRAI anti-spam amendment</a></li>
+    <li><a href="https://www.cuelinks.com/blog/best-affiliate-programs-in-india/">Cuelinks: Indian affiliate programs</a></li>
+    <li><a href="https://runtimewire.com/article/town-seeks-1-billion-valuation-index-ventures">Runtime Wire: Town at $1B</a></li>
+  </ul>
+</section>
+</main>
+</div>
+
+<script>
+(function(){
+  const FIELDS = [
+    {g:"Users", k:"mau", l:"Monthly active users", step:1000},
+    {g:"Users", k:"paidPct", l:"Paid conversion (%)", step:0.5},
+    {g:"Users", k:"nriPct", l:"Share of paid on Abroad plan (%)", step:1},
+    {g:"Pricing", k:"price", l:"Plus/Family blended price (₹)", step:10},
+    {g:"Pricing", k:"nriPrice", l:"Abroad plan price (₹)", step:50},
+    {g:"Pricing", k:"feeTasks", l:"Success-fee tasks per MAU", step:0.05},
+    {g:"Pricing", k:"fee", l:"Avg success fee (₹)", step:10},
+    {g:"Commerce", k:"gmvPaid", l:"GMV via Saathi, paid user (₹)", step:250},
+    {g:"Commerce", k:"gmvFree", l:"GMV via Saathi, free user (₹)", step:100},
+    {g:"Commerce", k:"take", l:"Blended take rate (%)", step:0.25},
+    {g:"Usage", k:"tasksPaid", l:"Tasks / paid user", step:1},
+    {g:"Usage", k:"tasksFree", l:"Tasks / free user", step:1},
+    {g:"Routing mix", k:"mixApi", l:"API / rails route (%)", step:5},
+    {g:"Routing mix", k:"mixBrowser", l:"Browser / cloud computer (%)", step:5},
+    {g:"Routing mix", k:"mixVoice", l:"Outbound call (%)", step:5},
+    {g:"Cost per task (₹)", k:"cApi", l:"API / rails task", step:0.5},
+    {g:"Cost per task (₹)", k:"cBrowser", l:"Browser / cloud-computer task", step:1},
+    {g:"Cost per task (₹)", k:"cVoice", l:"Outbound call task (~3–4 min)", step:1},
+    {g:"Cost per task (₹)", k:"escPct", l:"Human escalation rate (%)", step:0.5},
+    {g:"Cost per task (₹)", k:"cEsc", l:"Cost per human escalation", step:5},
+    {g:"Cost per task (₹)", k:"infra", l:"Messaging + infra per MAU", step:0.5},
+    {g:"Payments", k:"pgPct", l:"Payment/GST leakage on subs (%)", step:0.5},
+  ];
+  const PRESETS = {
+    instinct:{mau:100000,paidPct:0,nriPct:0,price:0,nriPrice:0,feeTasks:0,fee:0,gmvPaid:0,gmvFree:2500,take:4,tasksPaid:0,tasksFree:20,mixApi:10,mixBrowser:80,mixVoice:10,cApi:2,cBrowser:18,cVoice:12,escPct:2,cEsc:45,infra:4,pgPct:0},
+    launch:{mau:100000,paidPct:8,nriPct:15,price:299,nriPrice:1299,feeTasks:0.2,fee:79,gmvPaid:6000,gmvFree:800,take:3,tasksPaid:35,tasksFree:6,mixApi:65,mixBrowser:25,mixVoice:10,cApi:2,cBrowser:18,cVoice:12,escPct:4,cEsc:45,infra:4,pgPct:20},
+    scale:{mau:2000000,paidPct:12,nriPct:12,price:299,nriPrice:1299,feeTasks:0.3,fee:99,gmvPaid:8000,gmvFree:1200,take:4,tasksPaid:35,tasksFree:5,mixApi:80,mixBrowser:12,mixVoice:8,cApi:1.2,cBrowser:10,cVoice:9,escPct:2.5,cEsc:40,infra:3,pgPct:20},
+  };
+  let S = Object.assign({}, PRESETS.launch);
+  try{ const saved = JSON.parse(localStorage.getItem("saathi-calc")||"null"); if(saved) S = Object.assign(S, saved); }catch(e){}
+
+  const inputs = document.getElementById("inputs");
+  let html = "", group = "";
+  FIELDS.forEach(f=>{
+    if(f.g!==group){ if(group) html += "</fieldset>"; html += `<fieldset><legend>${f.g}</legend>`; group=f.g; }
+    html += `<label class="field" for="in-${f.k}"><span>${f.l}</span><input id="in-${f.k}" type="number" min="0" step="${f.step}" data-k="${f.k}"></label>`;
+  });
+  inputs.innerHTML = html + "</fieldset>";
+
+  const inr = n => "₹" + Math.round(n).toLocaleString("en-IN");
+  const inr1 = n => "₹" + (Math.round(n*10)/10).toLocaleString("en-IN",{minimumFractionDigits:1,maximumFractionDigits:1});
+  const big = n => { const a=Math.abs(n), s=n<0?"−":""; if(a>=1e7) return s+"₹"+(a/1e7).toFixed(2)+" Cr"; if(a>=1e5) return s+"₹"+(a/1e5).toFixed(1)+" L"; return s+"₹"+Math.round(a).toLocaleString("en-IN"); };
+
+  function fill(){ FIELDS.forEach(f=>{ document.getElementById("in-"+f.k).value = S[f.k]; }); }
+
+  function compute(){
+    const paid = S.mau*S.paidPct/100, free = S.mau-paid;
+    const nri = paid*S.nriPct/100, dom = paid-nri;
+    const subs = (dom*S.price + nri*S.nriPrice)*(1-S.pgPct/100);
+    const commission = (paid*S.gmvPaid + free*S.gmvFree)*S.take/100;
+    const fees = S.mau*S.feeTasks*S.fee;
+    const rev = subs+commission+fees;
+    const mixT = (S.mixApi+S.mixBrowser+S.mixVoice)||1;
+    const tasks = paid*S.tasksPaid + free*S.tasksFree;
+    const cApi = tasks*S.mixApi/mixT*S.cApi;
+    const cBr = tasks*S.mixBrowser/mixT*S.cBrowser;
+    const cVo = tasks*S.mixVoice/mixT*S.cVoice;
+    const cEs = tasks*S.escPct/100*S.cEsc;
+    const cIn = S.mau*S.infra;
+    const cost = cApi+cBr+cVo+cEs+cIn;
+    return {paid,free,tasks,subs,commission,fees,rev,cApi,cBr,cVo,cEs,cIn,cost,margin:rev-cost};
+  }
+
+  function bar(id, legId, parts){
+    const tot = parts.reduce((a,p)=>a+p.v,0)||1;
+    document.getElementById(id).innerHTML = parts.map(p=>`<i style="width:${(p.v/tot*100).toFixed(2)}%;background:${p.c}" title="${p.n}"></i>`).join("");
+    document.getElementById(legId).innerHTML = parts.map(p=>`<span><i style="background:${p.c}"></i>${p.n} ${Math.round(p.v/tot*100)}%</span>`).join("");
+  }
+
+  function render(){
+    const r = compute(), m = S.mau||1;
+    const mEl = document.getElementById("o-margin");
+    mEl.className = "big " + (r.margin>=0?"pos":"neg");
+    mEl.querySelector("b").textContent = (r.margin<0?"−":"") + inr1(Math.abs(r.margin/m)).replace("₹","₹") + "  (" + (r.rev? Math.round(r.margin/r.rev*100):"−∞") + "%)";
+    document.getElementById("o-rev").textContent = inr1(r.rev/m);
+    document.getElementById("o-cost").textContent = inr1(r.cost/m);
+    const css = getComputedStyle(document.documentElement);
+    const A = css.getPropertyValue("--accent").trim(), M = css.getPropertyValue("--marigold").trim(), G=css.getPropertyValue("--good").trim(), B=css.getPropertyValue("--bad").trim(), W=css.getPropertyValue("--warn").trim(), Mu=css.getPropertyValue("--muted").trim();
+    bar("bar-rev","leg-rev",[{n:"Subscriptions",v:r.subs,c:A},{n:"Commissions",v:r.commission,c:M},{n:"Success fees",v:r.fees,c:G}]);
+    bar("bar-cost","leg-cost",[{n:"API",v:r.cApi,c:A},{n:"Browser",v:r.cBr,c:B},{n:"Calls",v:r.cVo,c:M},{n:"Humans",v:r.cEs,c:W},{n:"Infra",v:r.cIn,c:Mu}]);
+    const rows = [
+      ["Paying users", Math.round(r.paid).toLocaleString("en-IN")],
+      ["Tasks / month", Math.round(r.tasks).toLocaleString("en-IN")],
+      ["Monthly revenue", big(r.rev)],
+      ["Monthly variable cost", big(r.cost)],
+      ["Monthly contribution", big(r.margin)],
+      ["Annualised contribution", big(r.margin*12)],
+      ["Cost per task", inr1(r.tasks? (r.cost-r.cIn)/r.tasks : 0)],
+    ];
+    document.getElementById("o-totals").innerHTML = rows.map(([a,b])=>`<tr><td>${a}</td><td class="r num">${b}</td></tr>`).join("");
+    try{ localStorage.setItem("saathi-calc", JSON.stringify(S)); }catch(e){}
+  }
+
+  inputs.addEventListener("input", e=>{
+    const k = e.target.dataset.k; if(!k) return;
+    const v = parseFloat(e.target.value); S[k] = isNaN(v)?0:v;
+    document.querySelectorAll(".presets button").forEach(b=>b.setAttribute("aria-pressed","false"));
+    render();
+  });
+  document.querySelectorAll(".presets button").forEach(b=>b.addEventListener("click",()=>{
+    S = Object.assign({}, PRESETS[b.dataset.preset]);
+    document.querySelectorAll(".presets button").forEach(x=>x.setAttribute("aria-pressed", String(x===b)));
+    fill(); render();
+  }));
+  fill(); render();
+  if(window.matchMedia) window.matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", render);
+})();
+</script>
