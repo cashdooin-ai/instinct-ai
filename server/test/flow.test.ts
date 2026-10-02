@@ -63,6 +63,12 @@ describe("buyer to shops to choice", () => {
     expect(list.rows[0].title).toContain("₹34,500");
     expect(textOf(list)).toContain("(lowest price)");
 
+    // "show" after offers arrived re-sends the list; other chatter gets a hint.
+    await text(BUYER, "show");
+    expect(messenger.last(BUYER).type).toBe("list");
+    await text(BUYER, "ok thanks");
+    expect(textOf(messenger.last(BUYER))).toContain("See offers");
+
     // Late offers are refused politely.
     const late = alerted[2]?.to;
     if (late) {

@@ -12,6 +12,8 @@ html,body{height:100%;margin:0}
 body{background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;display:flex;flex-direction:column}
 header{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 14px;background:var(--panel);border-bottom:1px solid var(--line)}
 header b{margin-right:8px}
+#who{flex:1 1 220px;min-width:0;max-width:420px}
+#name{flex:0 1 120px;min-width:0}
 select,input,button{font:inherit;padding:7px 10px;border-radius:8px;border:1px solid var(--line);background:var(--chip);color:var(--ink)}
 button{cursor:pointer}
 button.primary{background:var(--accent);border-color:var(--accent);color:var(--panel)}
@@ -27,6 +29,14 @@ button.primary{background:var(--accent);border-color:var(--accent);color:var(--p
 footer{background:var(--panel);border-top:1px solid var(--line);padding:10px 14px}
 footer form{display:flex;gap:8px;max-width:760px;margin:0 auto}
 footer input{flex:1;min-width:0}
+#loc{flex:0 1 170px;min-width:0}
+@media (max-width:560px){
+  footer form{flex-wrap:wrap}
+  #loc{flex:1 1 100%}
+  header label{display:none}
+  #chat{padding:12px}
+  .msg{max-width:92%}
+}
 .hint{font-size:12px;color:var(--muted);max-width:760px;margin:6px auto 0}
 .empty{color:var(--muted);text-align:center;margin-top:40px}
 </style>

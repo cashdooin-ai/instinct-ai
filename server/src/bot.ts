@@ -2,7 +2,7 @@
 import { CATEGORIES, getCategory } from "./catalog.js";
 import {
   broadcast, closeAndSend, createRequest, describeDraft, getConversation, getShopByPhone, logEvent,
-  pickOffer, saveOffer, setConversation, type Deps, type Draft, type RequestRow, type Shop,
+  pickOffer, rankedOffers, saveOffer, sendOfferList, setConversation, type Deps, type Draft, type RequestRow, type Shop,
 } from "./engine.js";
 import { nearestPlace, normalize, resolveArea } from "./geo.js";
 import { parseNumberList } from "./parser.js";
@@ -172,6 +172,14 @@ async function handleBuyer(deps: Deps, phone: string, conv: { state: string; dat
     }
   }
 
+  if (conv.state === "buyer_choosing" && /\b(show|offers|list|options|results)\b/.test(normalize(event.text))) {
+    const req = (await deps.db.query<RequestRow>(`SELECT * FROM requests WHERE id = $1`, [Number(conv.data.requestId)]))[0];
+    if (req?.status === "offers_sent") {
+      await sendOfferList(deps, req, await rankedOffers(deps.db, req.id));
+      return;
+    }
+  }
+
   const parsed = await deps.ai.understandRequest(event.text);
   const previous = conv.state === "buyer_confirm" ? draftFromData(conv.data) : null;
 
@@ -192,6 +200,10 @@ async function handleBuyer(deps: Deps, phone: string, conv: { state: string; dat
   if (!parsed.category) {
     if (conv.state === "buyer_waiting") {
       await say(deps, phone, "⏳ I'm still collecting offers for your request. Reply *SHOW* to see what's in so far, or *CANCEL* to stop.");
+      return;
+    }
+    if (conv.state === "buyer_choosing") {
+      await say(deps, phone, "Tap *See offers* above to choose one (or reply *SHOW* to see them again). To ask for something else, just send a new request.");
       return;
     }
     await say(deps, phone, parsed.isGreeting || conv.state === "idle" ? WELCOME : "Sorry, I didn't get that. What do you need? (an appliance or a home service)");

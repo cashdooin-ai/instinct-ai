@@ -203,6 +203,28 @@ function offerLine(o: RankedOffer): string {
   return bits.join(" · ");
 }
 
+/** Sends the buyer the ranked offers as a WhatsApp list. */
+export async function sendOfferList(deps: Deps, req: RequestRow, offers: RankedOffer[]): Promise<void> {
+  const top = offers.slice(0, 3);
+  const body = [
+    `🎉 *${offers.length} offer${offers.length > 1 ? "s" : ""}* for your ${req.brand ? req.brand + " " : ""}${req.item}:`,
+    "",
+    ...top.map((o, i) => `${i + 1}. *${o.shop_name}*${i === 0 ? " (lowest price)" : ""}\n   ${offerLine(o)}`),
+    "",
+    "Tap *See offers* to choose one. We'll share the shop's contact so you can confirm directly.",
+  ].join("\n");
+  await deps.messenger.send(req.buyer_phone, {
+    type: "list",
+    text: body,
+    button: "See offers",
+    rows: offers.slice(0, 10).map((o) => ({
+      id: `pick:${o.offer_id}`,
+      title: `${inr(o.price)} · ${o.shop_name}`,
+      description: [o.brand_model, o.eta, `${o.distance_km.toFixed(1)} km`, ratingText(o.rating_sum, o.rating_count)].filter(Boolean).join(" · "),
+    })),
+  });
+}
+
 /** Closes offer collection and sends the buyer their options. Safe to call twice. */
 export async function closeAndSend(deps: Deps, requestId: number): Promise<void> {
   const offers = await rankedOffers(deps.db, requestId);
@@ -223,24 +245,7 @@ export async function closeAndSend(deps: Deps, requestId: number): Promise<void>
     await setConversation(deps.db, req.buyer_phone, "idle", {});
     return;
   }
-  const top = offers.slice(0, 3);
-  const body = [
-    `🎉 *${offers.length} offer${offers.length > 1 ? "s" : ""}* for your ${req.brand ? req.brand + " " : ""}${req.item}:`,
-    "",
-    ...top.map((o, i) => `${i + 1}. *${o.shop_name}*${i === 0 ? " (lowest price)" : ""}\n   ${offerLine(o)}`),
-    "",
-    "Tap *See offers* to choose one. We'll share the shop's contact so you can confirm directly.",
-  ].join("\n");
-  await deps.messenger.send(req.buyer_phone, {
-    type: "list",
-    text: body,
-    button: "See offers",
-    rows: offers.slice(0, 10).map((o) => ({
-      id: `pick:${o.offer_id}`,
-      title: `${inr(o.price)} · ${o.shop_name}`,
-      description: [o.brand_model, o.eta, `${o.distance_km.toFixed(1)} km`, ratingText(o.rating_sum, o.rating_count)].filter(Boolean).join(" · "),
-    })),
-  });
+  await sendOfferList(deps, req, offers);
   await setConversation(deps.db, req.buyer_phone, "buyer_choosing", { requestId });
   await logEvent(deps.db, "offers_sent", req.buyer_phone, { requestId, offers: offers.length });
 }
