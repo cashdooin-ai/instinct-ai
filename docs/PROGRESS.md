@@ -31,3 +31,7 @@ simulator for testers until Meta approval. The owner has testers but no develope
 - Is the business registered (GST/Udyam)? Meta verification needs it.
 - WhatsApp number to use (new SIM).
 - Fee levels (₹99 appliances / ₹49 services per chosen offer) and whether to charge during the pilot.
+
+## 2026-10-02 (later): Screens checked
+- Screenshots of every screen are in `docs/screenshots/` (taken from a local run with demo shops).
+- Fixed: simulator overflowed on phones; "show" after offers arrived now re-sends the offer list.
