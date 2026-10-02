@@ -16,7 +16,7 @@ simulator for testers until Meta approval. The owner has testers but no develope
   demo shops, leads.
 - Simulator for testers; demo shops auto-quote. Test and real traffic never mix.
 - zyyko.com landing page + lead form, draft privacy page.
-- Render blueprint, setup guide, tester checklist. 35 automated tests.
+- Hosting: Railway (railway.json + root package.json) with Supabase; render.yaml kept as an alternative. Setup guide, tester checklist. 35 automated tests.
 
 **Not built yet (next candidates, roughly in order)**
 1. Owner feedback from testers → fix wording and parsing misses (collect from TESTING.md results).

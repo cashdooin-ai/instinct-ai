@@ -2,13 +2,13 @@
 
 You set up the accounts and paste in keys. Claude writes the code. You don't need to write any code to follow this guide.
 
-**Rules for keys and passwords:** paste them only into the Render dashboard (Step 2). Never paste them into chat, WhatsApp, email or GitHub.
+**Rules for keys and passwords:** paste them only into the Railway dashboard (Step 2). Never paste them into chat, WhatsApp, email or GitHub.
 
 You'll end up with:
 
 | What | Where | Cost |
 |---|---|---|
-| Server (bot, admin, simulator, website) | Render, Starter plan | about $7/month (~₹620) |
+| Server (bot, admin, simulator, website) | Railway, Hobby plan | about $5–8/month (~₹450–700) |
 | Database | Supabase, Free plan, Mumbai region | ₹0 to start |
 | Domain zyyko.com | your registrar | you already have it |
 | WhatsApp messages | Meta, pay per message | about ₹0.115 per message to shops |
@@ -32,36 +32,54 @@ You'll end up with:
 
 The app creates its own tables the first time it starts. Later, you can see all requests, shops and offers in Supabase under **Table Editor**.
 
-## Step 2: Server (Render), 15 minutes
+## Step 2: Server (Railway), 15 minutes
 
-1. Go to **render.com** and sign up **with GitHub**. Allow access to the `cashdooin-ai/instinct-ai` repository.
-2. Choose which code version to run:
-   - The code is on the branch `claude/optimistic-wright-ippj8t`. The simplest route is to merge it into `main` on GitHub (Claude can open the pull request; you click **Merge**).
-   - Or, in Step 4 below, change the branch to `claude/optimistic-wright-ippj8t`.
-3. In Render, click **New +**, then **Blueprint**, and pick the `instinct-ai` repository. Render reads the `render.yaml` file and shows a service called **zyyko**.
-4. Fill in the values it asks for:
-   - `DATABASE_URL`: from Step 1.
-   - `PUBLIC_BASE_URL`: leave blank for now; set it in Step 5.
-   - Leave all the WhatsApp, Anthropic and Sarvam values **blank** for now.
-5. Click **Apply**. The first deploy takes about 3–5 minutes.
-6. When it says **Live**, open `https://zyyko.onrender.com/health` (use your service's address, shown at the top of the page). You should see `{"ok":true}`.
+**Why Railway:** Zyyko needs a server that is always on. It answers WhatsApp at any hour and checks every 10 seconds for offer windows that have closed. Railway runs it like that and redeploys when new code is pushed.
 
-> Use the **Starter** plan, not Free. The Free plan goes to sleep, and the bot stops closing offer windows.
+- **Vercel isn't suitable:** it pauses between requests, so offer windows would never close.
+- **The Hostinger cloud server would work,** but you'd have to maintain it yourself: updates, security, restarts and SSL certificates. Keep it for later or for other uses.
 
-From now on, every time Claude pushes code to the branch Render watches, Render redeploys on its own.
+**2a. Make three secret tokens.** Use your password manager's generator: 40 characters, letters and numbers only. Save all three in the password manager.
+- `ADMIN_TOKEN`: opens the admin panel. Only you have this.
+- `TESTER_TOKEN`: opens the simulator. You share this with testers.
+- `WHATSAPP_VERIFY_TOKEN`: you'll paste this into Meta later.
+
+**2b. Create the service**
+1. Go to **railway.com** and log in with GitHub. Choose the **Hobby** plan (needed so it stays always on).
+2. Click **New Project → Deploy from GitHub repo**, then pick `cashdooin-ai/instinct-ai`.
+3. Open the new service, then **Settings**:
+   - **Source → Branch:** `main` if Claude's pull request has been merged, otherwise `claude/optimistic-wright-ippj8t`.
+   - **Root Directory:** leave **empty**. The repo's `railway.json` tells Railway how to build.
+   - **Region:** **Southeast Asia (Singapore)**, the closest to India and to your Supabase database in Mumbai.
+4. Open **Variables → Raw Editor** and paste this, replacing the values:
+   ```
+   DATABASE_URL=your Supabase link from Step 1
+   ADMIN_TOKEN=your admin token
+   TESTER_TOKEN=your tester token
+   WHATSAPP_VERIFY_TOKEN=your verify token
+   NODE_VERSION=22
+   OFFER_WINDOW_MINUTES=15
+   DEMO_AUTO_QUOTE=true
+   ```
+   Leave the WhatsApp, Anthropic and Sarvam keys out for now. Click **Update Variables**.
+5. Go to **Settings → Networking → Generate Domain**. You get an address like `zyyko-production.up.railway.app`.
+6. Railway deploys on its own (3–5 minutes). Open `https://YOUR-RAILWAY-ADDRESS/health`. You should see `{"ok":true}`.
+
+From now on, every time Claude pushes code to that branch, Railway redeploys on its own.
+
+> Prefer Render? `render.yaml` is also in the repo: Render → New → Blueprint, Starter plan, same variables.
 
 ## Step 3: Admin panel and testers
 
-1. In Render, open **zyyko → Environment**. Copy the values of **ADMIN_TOKEN** and **TESTER_TOKEN**. Render generated them for you.
-2. Open the admin panel on your phone or laptop:
-   `https://YOUR-RENDER-ADDRESS/admin?token=ADMIN_TOKEN`
+1. Open the admin panel on your phone or laptop:
+   `https://YOUR-RAILWAY-ADDRESS/admin?token=ADMIN_TOKEN`
    After the first time, the device remembers you.
-3. Go to **Shops**, then click **Add demo shops**. This creates 20 pretend shops across Tricity for testing.
-4. Send your testers this link (it's their link, not the admin one):
-   `https://YOUR-RENDER-ADDRESS/simulator?token=TESTER_TOKEN`
+2. Go to **Shops**, then click **Add demo shops**. This creates 20 pretend shops across Tricity for testing.
+3. Send your testers this link (it's their link, not the admin one):
+   `https://YOUR-RAILWAY-ADDRESS/simulator?token=TESTER_TOKEN`
    Also send them `docs/TESTING.md`.
 
-**Never share the ADMIN_TOKEN.** If it leaks, change it in Render → Environment and click **Save** (Render redeploys).
+**Never share the ADMIN_TOKEN.** If it leaks, change it in Railway → Variables (Railway redeploys).
 
 ## Step 4: Import your real shops
 
@@ -78,10 +96,11 @@ In the sheet, use **File → Download → CSV**, open the file, copy everything,
 
 ## Step 5: Connect zyyko.com
 
-1. In Render: **zyyko → Settings → Custom Domains → Add**, then `zyyko.com`. Add `www.zyyko.com` as well.
-2. Render shows the DNS records to add. Log in to where you bought zyyko.com (GoDaddy, Hostinger, etc.), open **DNS settings**, and add exactly those records.
-3. Wait 10 minutes to a few hours. Render shows **Verified** and adds HTTPS automatically.
-4. In Render → Environment, set `PUBLIC_BASE_URL` = `https://zyyko.com` and click **Save**.
+1. In Railway: **Settings → Networking → Custom Domain**. Add `www.zyyko.com`, then add `zyyko.com`.
+2. Railway shows a **CNAME** record for each. Log in to where zyyko.com's DNS is managed (e.g. Hostinger → Domains → DNS), and add the records exactly as shown.
+   - Many registrars can't put a CNAME on the bare `zyyko.com`. If yours refuses, either use the registrar's **redirect** feature to send `zyyko.com` → `https://www.zyyko.com`, or move DNS to **Cloudflare** (free), which supports it.
+3. Wait 10 minutes to a few hours. Railway shows the domain as active and adds HTTPS automatically.
+4. In Railway → Variables, add `PUBLIC_BASE_URL=https://www.zyyko.com` (or `https://zyyko.com`).
 
 ## Step 6: AI understanding (optional, recommended)
 
@@ -89,8 +108,8 @@ Without a key, built-in rules understand most messages (English and common Hingl
 
 1. Go to **console.anthropic.com** and sign up. Under **Billing**, add credit (start with $10).
 2. Under **Limits**, set a monthly spend limit, e.g. $20.
-3. Under **API Keys**, create a key named `zyyko-render`.
-4. Paste it in Render → Environment as `ANTHROPIC_API_KEY` and click **Save**.
+3. Under **API Keys**, create a key named `zyyko-server`.
+4. Add it in Railway → Variables as `ANTHROPIC_API_KEY`.
 
 `ANTHROPIC_MODEL` is set to `claude-opus-5-5`, the most capable option. To cut AI cost by about 4×, change it to `claude-haiku-4-5`. It's slightly less accurate on messy messages.
 
@@ -108,20 +127,20 @@ This takes the longest, mostly waiting for Meta's approval. You need:
 **7b. App and number**
 1. Go to **developers.facebook.com → My Apps → Create app**. Choose **Business**, connect your Zyyko business portfolio, and add the **WhatsApp** product.
 2. In **WhatsApp → API Setup**, click **Add phone number**. Enter the new SIM number, display name **Zyyko**, and category **Shopping & Retail**, then verify it with the SMS code.
-3. Copy the **Phone number ID** and put it in Render as `WHATSAPP_PHONE_NUMBER_ID`.
-4. In **App settings → Basic**, click **Show** next to App secret. Put it in Render as `META_APP_SECRET`.
+3. Copy the **Phone number ID** and put it in Railway → Variables as `WHATSAPP_PHONE_NUMBER_ID`.
+4. In **App settings → Basic**, click **Show** next to App secret. Put it in Railway → Variables as `META_APP_SECRET`.
 5. In WhatsApp Manager, add a **payment method** for message charges.
 
 **7c. Permanent access token**
 1. In **business.facebook.com → Settings → Users → System users**, click **Add**. Name it `zyyko-server` with the Admin role.
 2. Click **Assign assets**: give it full control of your app and your WhatsApp account.
 3. Click **Generate token**, choose your app, set it to never expire, and tick `whatsapp_business_messaging` and `whatsapp_business_management`.
-4. Put the token in Render as `WHATSAPP_TOKEN`.
+4. Put the token in Railway → Variables as `WHATSAPP_TOKEN`.
 
 **7d. Webhook (how messages reach the server)**
 1. In **developers.facebook.com → your app → WhatsApp → Configuration → Webhook**, click **Edit**:
    - Callback URL: `https://zyyko.com/webhooks/whatsapp`
-   - Verify token: copy `WHATSAPP_VERIFY_TOKEN` from Render → Environment and paste it here.
+   - Verify token: copy `WHATSAPP_VERIFY_TOKEN` from Railway → Variables and paste it here.
 2. Click **Verify and save**, then subscribe to the **messages** field.
 
 **7e. Message template for shops**
@@ -147,14 +166,14 @@ Submit it. Approval usually takes minutes to a day.
 
 **7f. Go live**
 1. In the app dashboard, switch the app to **Live** and add the privacy URL `https://zyyko.com/privacy`.
-2. In Render, click **Save** so it redeploys with the WhatsApp keys.
+2. Add the WhatsApp keys in Railway → Variables; Railway redeploys with them.
 3. From your own phone, message the Zyyko number: `AC service tomorrow VIP Road Zirakpur`. You should get a reply within seconds.
 4. In `web/index.html`, set the WhatsApp number (Claude will do this; just tell Claude the number).
 
 ## Step 8: Voice notes (optional)
 
 1. Go to **dashboard.sarvam.ai** and create an API key.
-2. Put it in Render as `SARVAM_API_KEY`. Voice notes in Hindi, Punjabi and English are then turned into text.
+2. Put it in Railway → Variables as `SARVAM_API_KEY`. Voice notes in Hindi, Punjabi and English are then turned into text.
 
 ## Step 9: Before real customers
 
@@ -165,6 +184,6 @@ Submit it. Approval usually takes minutes to a day.
 
 ## When something breaks
 
-1. Render → zyyko → **Logs**. Copy the red lines (they never contain your keys) and paste them to Claude.
+1. Railway → your service → **Deployments → View logs**. Copy the red lines (they never contain your keys) and paste them to Claude.
 2. Admin panel → the request's page shows which shops were asked and what they replied.
 3. Supabase → **Table Editor** → `events` lists everything that happened, newest at the bottom.

@@ -2,7 +2,7 @@
 
 Zyyko (zyyko.com) is a WhatsApp-first local-offers marketplace for Chandigarh Tricity: a buyer asks once,
 nearby shops reply with prices, the buyer picks. The owner is not a developer. Claude writes all code; the
-owner manages accounts and Render settings (see docs/SETUP.md). Read docs/PROGRESS.md first. It's the
+owner manages accounts and Railway settings (see docs/SETUP.md). Read docs/PROGRESS.md first. It's the
 running log of what's built and what's next. Update it at the end of every session.
 
 ## Layout

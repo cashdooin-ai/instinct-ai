@@ -1,0 +1,11 @@
+{
+  "name": "zyyko",
+  "private": true,
+  "description": "Root wrapper so hosts like Railway can build and start the server in server/.",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "build": "cd server && npm ci --include=dev && npm run build",
+    "start": "cd server && npm start",
+    "test": "cd server && npm test"
+  }
+}
