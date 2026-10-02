@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Zyyko Simulator</title>
+<style>
+:root{--bg:#EEF0F6;--panel:#fff;--ink:#151A2C;--muted:#596079;--line:#D8DCE8;--accent:#2340A0;--me:#DCE6FF;--bot:#fff;--chip:#F5F6FA}
+@media (prefers-color-scheme:dark){:root{--bg:#0B0E1A;--panel:#161A2E;--ink:#E5E8F3;--muted:#9BA2BC;--line:#2A3050;--accent:#8EA6FF;--me:#24305E;--bot:#1D2238;--chip:#10142A;color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;display:flex;flex-direction:column}
+header{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 14px;background:var(--panel);border-bottom:1px solid var(--line)}
+header b{margin-right:8px}
+select,input,button{font:inherit;padding:7px 10px;border-radius:8px;border:1px solid var(--line);background:var(--chip);color:var(--ink)}
+button{cursor:pointer}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--panel)}
+#chat{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:8px;max-width:760px;width:100%;margin:0 auto}
+.msg{max-width:85%;padding:9px 12px;border-radius:12px;white-space:pre-wrap;word-wrap:break-word;box-shadow:0 1px 1px rgba(0,0,0,.06)}
+.in{align-self:flex-end;background:var(--me);border-bottom-right-radius:4px}
+.out{align-self:flex-start;background:var(--bot);border-bottom-left-radius:4px;border:1px solid var(--line)}
+.tag{font-size:11px;color:var(--muted);display:block;margin-bottom:4px}
+.actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.actions button{background:transparent;border-color:var(--accent);color:var(--accent);padding:5px 10px}
+.row{display:block;width:100%;text-align:left;margin-top:6px;background:var(--chip);border-color:var(--line);color:var(--ink)}
+.row small{display:block;color:var(--muted)}
+footer{background:var(--panel);border-top:1px solid var(--line);padding:10px 14px}
+footer form{display:flex;gap:8px;max-width:760px;margin:0 auto}
+footer input{flex:1;min-width:0}
+.hint{font-size:12px;color:var(--muted);max-width:760px;margin:6px auto 0}
+.empty{color:var(--muted);text-align:center;margin-top:40px}
+</style>
+</head>
+<body>
+<header>
+  <b>Zyyko Simulator</b>
+  <label for="who">Act as</label>
+  <select id="who"></select>
+  <input id="name" placeholder="Your name" size="10" value="Tester">
+  <button id="reset" type="button" title="Clear this chat and start over">Clear chat</button>
+</header>
+<div id="chat"><div class="empty">Pick who you are, then send a message.</div></div>
+<footer>
+  <form id="form">
+    <select id="loc" title="Share a location"><option value="">📍 Location…</option></select>
+    <input id="text" placeholder="Type a message, e.g. 1.5 ton AC under 40k Sector 70 Mohali" autocomplete="off">
+    <button class="primary">Send</button>
+  </form>
+  <div class="hint">Buyers: try “AC service tomorrow, VIP Road Zirakpur”. Shops: switch “Act as” to a demo shop to see requests and tap <i>Send price</i>. Demo shops also reply automatically within a minute.</div>
+</footer>
+<script>
+(function () {
+  var who = document.getElementById("who"), chat = document.getElementById("chat"), form = document.getElementById("form");
+  var text = document.getElementById("text"), loc = document.getElementById("loc"), nameEl = document.getElementById("name");
+  var lastId = 0, places = [], timer = null;
+
+  function phone() { return who.value; }
+  function esc(s) { return String(s).replace(/[&<>]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]; }); }
+  function fmt(s) { return esc(s).replace(/\*([^*\n]+)\*/g, "<b>$1</b>").replace(/_([^_\n]+)_/g, "<i>$1</i>"); }
+
+  function api(path, body) {
+    return fetch(path, body ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) } : {})
+      .then(function (r) { return r.json(); });
+  }
+
+  function send(payload) {
+    payload.phone = phone(); payload.name = nameEl.value;
+    return api("/simulator/api/send", payload).then(poll);
+  }
+
+  function render(m) {
+    var p = m.payload, el = document.createElement("div");
+    el.className = "msg " + (m.direction === "in" ? "in" : "out");
+    var html = "";
+    if (p.type === "template") html += '<span class="tag">Template message (sent outside the 24-hour window)</span>';
+    html += fmt(p.text || p.previewText || "");
+    el.innerHTML = html;
+    var buttons = p.buttons || p.previewButtons;
+    if (m.direction === "out" && buttons) {
+      var a = document.createElement("div"); a.className = "actions";
+      buttons.forEach(function (b) {
+        var btn = document.createElement("button"); btn.type = "button"; btn.textContent = b.title;
+        btn.onclick = function () { send({ buttonId: b.id, buttonTitle: b.title }); };
+        a.appendChild(btn);
+      });
+      el.appendChild(a);
+    }
+    if (m.direction === "out" && p.type === "list") {
+      var label = document.createElement("div"); label.className = "tag"; label.style.marginTop = "8px"; label.textContent = p.button;
+      el.appendChild(label);
+      p.rows.forEach(function (r) {
+        var btn = document.createElement("button"); btn.type = "button"; btn.className = "row";
+        btn.innerHTML = esc(r.title) + (r.description ? "<small>" + esc(r.description) + "</small>" : "");
+        btn.onclick = function () { send({ buttonId: r.id, buttonTitle: r.title }); };
+        el.appendChild(btn);
+      });
+    }
+    if (m.direction === "out" && p.type === "location_request") {
+      var hint = document.createElement("div"); hint.className = "tag"; hint.style.marginTop = "6px";
+      hint.textContent = "Use the 📍 Location menu below to share a location, or type an area.";
+      el.appendChild(hint);
+    }
+    chat.appendChild(el);
+  }
+
+  function poll() {
+    if (!phone()) return Promise.resolve();
+    return api("/simulator/api/messages?phone=" + encodeURIComponent(phone()) + "&after=" + lastId).then(function (d) {
+      if (!d.messages) return;
+      if (d.messages.length && lastId === 0) chat.innerHTML = "";
+      d.messages.forEach(function (m) { render(m); lastId = Math.max(lastId, m.id); });
+      if (d.messages.length) chat.scrollTop = chat.scrollHeight;
+    });
+  }
+
+  function switchTo() {
+    lastId = 0; chat.innerHTML = '<div class="empty">No messages yet. Say hi!</div>';
+    try { localStorage.setItem("zyyko-sim-who", who.value); } catch (e) {}
+    poll();
+  }
+
+  api("/simulator/api/identities").then(function (d) {
+    var html = '<optgroup label="Buyers">';
+    for (var i = 1; i <= 5; i++) html += '<option value="sim-buyer-' + i + '">Buyer ' + i + "</option>";
+    html += '<option value="sim-newshop-1">New shop (to test JOIN)</option></optgroup><optgroup label="Demo shops">';
+    d.shops.forEach(function (s) { html += '<option value="' + esc(s.phone) + '">' + esc(s.name) + " · " + esc(s.area) + "</option>"; });
+    if (!d.shops.length) html += "<option disabled>No demo shops yet: admin → Shops → Add demo shops</option>";
+    who.innerHTML = html + "</optgroup>";
+    places = d.places;
+    loc.innerHTML = '<option value="">📍 Location…</option>' + places.map(function (p, i) { return '<option value="' + i + '">' + esc(p.name) + "</option>"; }).join("");
+    try { var saved = localStorage.getItem("zyyko-sim-who"); if (saved) who.value = saved; } catch (e) {}
+    switchTo();
+    timer = setInterval(poll, 1500);
+  });
+
+  who.onchange = switchTo;
+  loc.onchange = function () {
+    var p = places[Number(loc.value)]; if (!p) return;
+    send({ lat: p.lat, lng: p.lng, label: p.name }); loc.value = "";
+  };
+  form.onsubmit = function (e) {
+    e.preventDefault();
+    var t = text.value.trim(); if (!t) return;
+    text.value = ""; send({ text: t });
+  };
+  document.getElementById("reset").onclick = function () {
+    api("/simulator/api/reset", { phone: phone() }).then(switchTo);
+  };
+})();
+</script>
+</body>
+</html>

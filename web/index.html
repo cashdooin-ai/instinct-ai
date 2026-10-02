@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Zyyko · Local shops compete for you in Tricity</title>
+<meta name="description" content="Tell Zyyko what you need on WhatsApp. Nearby shops in Chandigarh, Mohali, Zirakpur and Panchkula send their best price in minutes. AC, fridge, TV, AC service, plumber, electrician and more.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;700;800&family=Literata:opsz,wght@7..72,400;7..72,600&display=swap">
+<style>
+:root{--bg:#F5F6FA;--card:#fff;--ink:#151A2C;--muted:#596079;--line:#D8DCE8;--accent:#2340A0;--accent-soft:#E4E9F8;--chili:#C2410C;--chili-soft:#FCE9DF;
+  --display:"Sora","Segoe UI",system-ui,sans-serif;--body:"Literata",Georgia,serif}
+@media (prefers-color-scheme:dark){:root{--bg:#0E1120;--card:#161A2E;--ink:#E5E8F3;--muted:#9BA2BC;--line:#2A3050;--accent:#8EA6FF;--accent-soft:#1D2547;--chili:#FF8A50;--chili-soft:#3A2116;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 var(--body);padding-inline:16px}
+.wrap{max-width:1080px;margin:0 auto}
+nav{display:flex;justify-content:space-between;align-items:center;padding-block:18px;font-family:var(--display)}
+.logo{font-weight:800;font-size:22px;letter-spacing:-.02em;color:var(--ink);text-decoration:none}
+.logo span{color:var(--chili)}
+nav a.cta-sm{font-size:14px;color:var(--accent);text-decoration:none;font-weight:600}
+.hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:40px;align-items:center;padding-block:40px 56px}
+@media (max-width:820px){.hero{grid-template-columns:minmax(0,1fr)}}
+.eyebrow{font-family:var(--display);font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--chili);font-weight:600}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(2.2rem,5.4vw,3.6rem);line-height:1.04;letter-spacing:-.03em;margin:.25em 0 .35em;text-wrap:balance}
+h1 em{font-style:normal;color:var(--accent)}
+.lede{font-size:1.15rem;max-width:34em;color:var(--ink)}
+.ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px}
+.btn{font-family:var(--display);font-weight:700;font-size:16px;padding:13px 20px;border-radius:10px;text-decoration:none;border:2px solid var(--accent);display:inline-block;cursor:pointer}
+.btn.primary{background:var(--accent);color:var(--bg)}
+.btn.ghost{color:var(--accent);background:transparent}
+.btn:focus-visible{outline:3px solid var(--chili);outline-offset:2px}
+.note{font-size:14px;color:var(--muted);margin-top:10px;font-family:var(--display)}
+.phone{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:9px;box-shadow:0 20px 50px -30px rgba(20,30,80,.45)}
+.msg{max-width:88%;padding:9px 12px;border-radius:12px;font-family:var(--display);font-size:14px;line-height:1.45}
+.me{align-self:flex-end;background:var(--accent);color:var(--bg);border-bottom-right-radius:4px}
+.bot{align-self:flex-start;background:var(--bg);border:1px solid var(--line);border-bottom-left-radius:4px}
+.offer{display:block;font-size:13px;margin-top:5px;padding:6px 8px;border-radius:8px;background:var(--card);border:1px solid var(--line)}
+.offer b{color:var(--chili)}
+section{padding-block:48px;border-top:1px solid var(--line)}
+h2{font-family:var(--display);font-weight:700;font-size:clamp(1.5rem,3vw,2rem);letter-spacing:-.02em;margin:0 0 20px;text-wrap:balance}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;counter-reset:s}
+.step{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px}
+.step h3{font-family:var(--display);font-size:1.05rem;margin:0 0 6px}
+.step h3::before{counter-increment:s;content:counter(s);display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-size:13px;margin-right:8px}
+.step p{margin:0;font-size:15.5px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--display);font-size:14px;padding:6px 12px;border-radius:99px;background:var(--card);border:1px solid var(--line)}
+.chip.s{background:var(--chili-soft);border-color:transparent}
+.towns{font-family:var(--display);color:var(--muted);margin-top:14px}
+.shops{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:32px}
+@media (max-width:820px){.shops{grid-template-columns:minmax(0,1fr)}}
+.shops ul{padding-left:20px;margin:0}
+form{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;display:grid;gap:12px}
+label{font-family:var(--display);font-size:14px;font-weight:600;display:grid;gap:5px}
+input,select{font:inherit;font-family:var(--display);font-size:15px;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:100%}
+#formMsg{font-family:var(--display);font-size:14px;min-height:1.2em}
+footer{padding-block:28px 40px;border-top:1px solid var(--line);font-family:var(--display);font-size:14px;color:var(--muted);display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between}
+footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav><a class="logo" href="/">zyyko<span>.</span></a><a class="cta-sm" href="#shops">For shop owners →</a></nav>
+
+  <div class="hero">
+    <div>
+      <div class="eyebrow">Chandigarh · Mohali · Zirakpur · Panchkula</div>
+      <h1>Ask once. <em>Local shops compete.</em> You pick.</h1>
+      <p class="lede">Tell Zyyko what you need on WhatsApp, typed or as a voice note. Nearby shops send their best price in minutes. Compare, choose, done.</p>
+      <div class="ctas">
+        <a class="btn primary" id="waLink" href="#join">Chat on WhatsApp</a>
+        <a class="btn ghost" href="#how">How it works</a>
+      </div>
+      <p class="note" id="waNote">Free for buyers. No app to download.</p>
+    </div>
+    <div class="phone" aria-label="Example chat">
+      <div class="msg me">1.5 ton inverter AC under 40k, Sector 70 Mohali, with installation</div>
+      <div class="msg bot">Asking 7 shops near Sector 70, Mohali… ⏳</div>
+      <div class="msg bot">🎉 3 offers for your AC:
+        <span class="offer"><b>₹34,500</b> · Cool Point AC · LG 3★ · today · 1.8 km</span>
+        <span class="offer"><b>₹36,900</b> · Sharma Electronics · Voltas 5★ · tomorrow · 0.6 km</span>
+        <span class="offer"><b>₹37,400</b> · Gill Home Appliances · Daikin 3★ · 4.1 km</span>
+      </div>
+    </div>
+  </div>
+
+  <section id="how">
+    <h2>How Zyyko works</h2>
+    <div class="steps">
+      <div class="step"><h3>Tell us what you need</h3><p>Item or service, budget, area and when. Hindi, Punjabi or English is fine.</p></div>
+      <div class="step"><h3>Nearby shops reply</h3><p>We ask the best-rated shops near you. They send live prices and availability.</p></div>
+      <div class="step"><h3>Pick the best offer</h3><p>See the top offers side by side. Choose one, and the shop calls you to confirm.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>What you can ask for</h2>
+    <div class="chips">
+      <span class="chip">AC</span><span class="chip">Refrigerator</span><span class="chip">Washing machine</span><span class="chip">TV</span>
+      <span class="chip">Water purifier</span><span class="chip">Geyser</span><span class="chip">Microwave</span><span class="chip">Cooler</span><span class="chip">Chimney</span>
+      <span class="chip s">AC service &amp; repair</span><span class="chip s">Appliance repair</span><span class="chip s">RO service</span><span class="chip s">Plumber</span>
+      <span class="chip s">Electrician</span><span class="chip s">Carpenter</span><span class="chip s">Painter</span><span class="chip s">Pest control</span><span class="chip s">Home cleaning</span>
+    </div>
+    <p class="towns">Now serving Chandigarh, Mohali, Kharar, New Chandigarh, Zirakpur, Panchkula, Derabassi, Pinjore and Kalka.</p>
+  </section>
+
+  <section id="shops">
+    <div class="shops">
+      <div>
+        <h2>Own a shop or offer services?</h2>
+        <ul>
+          <li>Get real customers from your area, straight on WhatsApp.</li>
+          <li>Free to join. Pay a small fee only when a customer picks your offer.</li>
+          <li>No app, no package to buy. Reply with your price in one message.</li>
+        </ul>
+        <p class="note">Already on WhatsApp? Send <b>JOIN</b> to our number to sign up in 2 minutes.</p>
+      </div>
+      <form id="join" novalidate>
+        <label for="kind">I am a
+          <select id="kind" name="kind"><option value="shop">Shop owner / service provider</option><option value="buyer">Buyer, tell me when you launch</option></select>
+        </label>
+        <label for="name">Name / shop name<input id="name" name="name" autocomplete="name" required></label>
+        <label for="phone">WhatsApp number<input id="phone" name="phone" inputmode="tel" autocomplete="tel" placeholder="98765 43210" required></label>
+        <label for="area">Area<input id="area" name="area" placeholder="e.g. Phase 7 Mohali"></label>
+        <label for="category">What do you sell or need?<input id="category" name="category" placeholder="e.g. ACs, fridges, AC repair"></label>
+        <button class="btn primary" type="submit">Send</button>
+        <div id="formMsg" role="status"></div>
+      </form>
+    </div>
+  </section>
+
+  <footer><span>© Zyyko · Tricity, India</span><span><a href="/privacy">Privacy</a></span></footer>
+</div>
+<script>
+  // Set this to the Zyyko WhatsApp number (digits only, with 91) once it's live.
+  var ZYYKO_WHATSAPP = "";
+  (function () {
+    var link = document.getElementById("waLink"), note = document.getElementById("waNote");
+    if (ZYYKO_WHATSAPP) {
+      link.href = "https://wa.me/" + ZYYKO_WHATSAPP + "?text=" + encodeURIComponent("Hi Zyyko");
+      link.target = "_blank"; link.rel = "noopener";
+    } else {
+      link.textContent = "Get early access";
+      note.textContent = "WhatsApp launching soon in Tricity. Leave your number and we'll message you.";
+    }
+    var form = document.getElementById("join"), msg = document.getElementById("formMsg");
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var data = {}; new FormData(form).forEach(function (v, k) { data[k] = v; });
+      msg.textContent = "Sending…";
+      fetch("/api/leads", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) })
+        .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+        .then(function (res) {
+          if (res.ok) { form.reset(); msg.textContent = "Thanks! We'll message you on WhatsApp soon."; }
+          else msg.textContent = res.j.error || "Something went wrong. Please try again.";
+        })
+        .catch(function () { msg.textContent = "Couldn't send. Check your connection and try again."; });
+    });
+  })();
+</script>
+</body>
+</html>

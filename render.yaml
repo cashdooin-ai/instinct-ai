@@ -1,0 +1,42 @@
+# Render Blueprint: one web service runs the bot, admin, simulator and zyyko.com.
+# In Render: New → Blueprint → pick this repo. Then fill the secret values it asks for.
+services:
+  - type: web
+    name: zyyko
+    runtime: node
+    region: singapore
+    plan: starter
+    branch: main
+    buildCommand: cd server && npm ci && npm run build
+    startCommand: cd server && npm start
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: DATABASE_URL
+        sync: false
+      - key: ADMIN_TOKEN
+        generateValue: true
+      - key: TESTER_TOKEN
+        generateValue: true
+      - key: PUBLIC_BASE_URL
+        sync: false
+      - key: WHATSAPP_TOKEN
+        sync: false
+      - key: WHATSAPP_PHONE_NUMBER_ID
+        sync: false
+      - key: WHATSAPP_VERIFY_TOKEN
+        generateValue: true
+      - key: META_APP_SECRET
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: ANTHROPIC_MODEL
+        value: claude-opus-5-5
+      - key: SARVAM_API_KEY
+        sync: false
+      - key: OFFER_WINDOW_MINUTES
+        value: "15"
+      - key: DEMO_AUTO_QUOTE
+        value: "true"

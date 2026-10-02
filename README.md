@@ -1,4 +1,15 @@
-# instinct-ai: India personal-agent research
+# Zyyko: local shops compete for you
+
+WhatsApp-first marketplace for Chandigarh Tricity. A buyer asks once, nearby shops send offers, the buyer picks.
+
+- **Run it / set it up:** [docs/SETUP.md](docs/SETUP.md) (owner, no coding needed)
+- **Test it:** [docs/TESTING.md](docs/TESTING.md) (testers)
+- **What's built and what's next:** [docs/PROGRESS.md](docs/PROGRESS.md)
+- **Code:** `server/` (bot, admin, simulator, API) and `web/` (zyyko.com). `cd server && npm install && npm test`
+
+---
+
+## Background research
 
 Research and strategy for an India-first personal AI agent (working name **Saathi**), modelled on and positioned against Instinct (Spear Street Technology).
 
