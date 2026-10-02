@@ -8,3 +8,7 @@ Key points:
 1. Instinct is free, makes money from merchant commissions (~$1B annualised GMV, ~50% travel) and spends heavily on cloud-computer compute.
 2. Instinct runs on Meta's official WhatsApp Cloud API even though the general-purpose AI ban applies in the US and India. Saathi should use WhatsApp as a structured "errand service" front door but never as its only channel.
 3. The edge in India: API-first routing over UPI, ONDC, BBPS and merchant MCPs (cheaper than computer use), Indic voice calls, a refund and sarkari "fixer" desk paid by success fees, an NRI "Abroad" plan for parents, and visible privacy and commissions.
+
+## Zyyko (zyyko.com): local commerce through AI
+
+- `docs/zyyko-blueprint.html`: blueprint for an AI marketplace where a buyer asks once (WhatsApp, ChatGPT app, Claude connector, Grok MCP, zyyko.com), nearby shops reply with live offers, and the buyer pays in chat with WhatsApp Pay/UPI. Covers competition (Justdial, Meta Business Agent, Google AI Mode, quick commerce, magicpin, ChattyBao, ONDC), lessons from failures (PhonePe Pincode, Lookup, Dunzo), channels, which categories to start with, architecture, revenue (shops pay per chosen offer, commissions, Zyyko Pro), a city economics calculator, risks and a 6-week go/no-go pilot.

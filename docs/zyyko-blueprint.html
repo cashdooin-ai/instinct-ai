@@ -1,0 +1,494 @@
+<title>Zyyko Blueprint</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;700;800&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column (~70ch) with wide breakouts for tables, the flow diagram and the city calculator; sticky index on wide screens. */
+:root{
+  --bg:#F5F6FA; --surface:#FFFFFF; --ink:#151A2C; --muted:#596079; --line:#D8DCE8;
+  --accent:#2340A0;      /* ink blue: the "ask" */
+  --accent-soft:#E4E9F8;
+  --chili:#C2410C;       /* vendor side, offers */
+  --chili-soft:#FCE9DF;
+  --good:#1E7A3E; --warn:#9A6400; --bad:#B3261E;
+  --good-soft:#E2F3E7; --warn-soft:#FBEFD9; --bad-soft:#FBE4E2;
+  --display:"Sora","Segoe UI",system-ui,sans-serif;
+  --body:"Literata",Georgia,"Times New Roman",serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  --measure:70ch;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1120; --surface:#161A2E; --ink:#E5E8F3; --muted:#9BA2BC; --line:#2A3050;
+    --accent:#8EA6FF; --accent-soft:#1D2547; --chili:#FF8A50; --chili-soft:#3A2116;
+    --good:#6BCB8B; --warn:#F0B53A; --bad:#F2867E; --good-soft:#16301F; --warn-soft:#33290F; --bad-soft:#3A1A18;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E1120; --surface:#161A2E; --ink:#E5E8F3; --muted:#9BA2BC; --line:#2A3050;
+  --accent:#8EA6FF; --accent-soft:#1D2547; --chili:#FF8A50; --chili-soft:#3A2116;
+  --good:#6BCB8B; --warn:#F0B53A; --bad:#F2867E; --good-soft:#16301F; --warn-soft:#33290F; --bad-soft:#3A1A18;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;padding-inline:16px;padding-block:0 64px}
+.wrap{max-width:1120px;margin:0 auto;display:grid;grid-template-columns:190px minmax(0,1fr);gap:48px}
+@media (max-width:900px){.wrap{grid-template-columns:minmax(0,1fr);gap:0}.toc{display:none}}
+.toc{position:sticky;top:calc(env(safe-area-inset-top,0px) + 24px);align-self:start;padding-top:40px;font-family:var(--display);font-size:13px}
+.toc a{display:block;color:var(--muted);text-decoration:none;padding:4px 0 4px 10px;border-left:2px solid var(--line)}
+.toc a:hover,.toc a:focus-visible{color:var(--accent);border-color:var(--accent)}
+main{min-width:0}
+header.hero{padding-block:40px 28px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--chili)}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(2.1rem,5vw,3.3rem);line-height:1.06;margin:.3em 0 .35em;text-wrap:balance;letter-spacing:-.02em}
+h1 em{font-style:normal;color:var(--accent)}
+.lede{font-size:1.16rem;max-width:var(--measure)}
+.meta{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:14px}
+section{padding-block:40px 8px;border-bottom:1px solid var(--line)}
+h2{font-family:var(--display);font-weight:700;font-size:1.7rem;line-height:1.15;margin:0 0 .6em;text-wrap:balance;letter-spacing:-.01em}
+h3{font-family:var(--display);font-weight:700;font-size:1.1rem;margin:1.4em 0 .4em}
+p,ul,ol{max-width:var(--measure)}
+li{margin:.25em 0}
+a{color:var(--accent)}
+strong{font-weight:600}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.verdict{background:var(--accent-soft);border-radius:10px;padding:18px 20px;max-width:var(--measure);margin:20px 0 4px}
+.verdict .tag{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);display:block;margin-bottom:4px}
+.verdict p{margin:.3em 0}
+.callout{background:var(--chili-soft);border-radius:8px;padding:14px 18px;max-width:var(--measure);margin:16px 0}
+.callout .tag{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--chili);display:block;margin-bottom:4px}
+/* chat mock */
+.chat{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin:20px 0}
+.phone{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.phone h4{font-family:var(--display);font-size:13px;margin:0 0 4px;color:var(--muted);font-weight:500}
+.msg{max-width:88%;padding:8px 11px;border-radius:10px;font-family:var(--display);font-size:13.5px;line-height:1.45}
+.msg.me{align-self:flex-end;background:var(--accent);color:var(--bg);border-bottom-right-radius:3px}
+.msg.bot{align-self:flex-start;background:var(--bg);border:1px solid var(--line);border-bottom-left-radius:3px}
+.msg.v{align-self:flex-start;background:var(--chili-soft);border-bottom-left-radius:3px}
+.msg .opt{display:block;font-family:var(--mono);font-size:12px;margin-top:4px}
+.msg .btn{display:inline-block;margin-top:6px;margin-right:4px;font-size:12px;border:1px solid currentColor;border-radius:99px;padding:1px 9px;opacity:.85}
+.tablewrap{overflow-x:auto;margin:16px 0;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:14.5px;font-family:var(--display)}
+th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--line)}
+th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;background:var(--bg)}
+tr:last-child td{border-bottom:0}
+td.r,th.r{text-align:right;font-variant-numeric:tabular-nums}
+.pill{display:inline-block;font-family:var(--mono);font-size:11px;padding:2px 8px;border-radius:99px;white-space:nowrap}
+.p-hi{background:var(--bad-soft);color:var(--bad)} .p-md{background:var(--warn-soft);color:var(--warn)} .p-lo{background:var(--good-soft);color:var(--good)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin:18px 0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px 18px;min-width:0}
+.card h4{font-family:var(--display);font-size:1rem;margin:0 0 6px}
+.card p{font-size:15px;margin:0}
+.card .vs{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-top:10px;display:block}
+pre.mermaid{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px;overflow-x:auto;font-family:var(--mono);font-size:13px}
+/* calculator */
+.calc{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;margin:18px 0}
+.presets{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.presets button{font-family:var(--display);font-size:13.5px;border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:7px 12px;border-radius:99px;cursor:pointer}
+.presets button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+.presets button:focus-visible,.calc input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.calc-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:24px}
+@media (max-width:760px){.calc-grid{grid-template-columns:minmax(0,1fr)}}
+fieldset{border:0;padding:0;margin:0 0 14px}
+legend{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+.field{display:grid;grid-template-columns:minmax(0,1fr) 110px;gap:10px;align-items:center;padding:4px 0;font-family:var(--display);font-size:14px}
+.field input{width:100%;font-family:var(--mono);font-size:14px;padding:5px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);text-align:right}
+.out{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);align-self:start;display:grid;gap:10px}
+.big{background:var(--bg);border-radius:8px;padding:14px;border:1px solid var(--line)}
+.big b{display:block;font-family:var(--display);font-size:1.6rem;font-variant-numeric:tabular-nums}
+.big span{font-family:var(--display);font-size:12.5px;color:var(--muted)}
+.pos b{color:var(--good)} .neg b{color:var(--bad)}
+.bar{display:flex;height:14px;border-radius:4px;overflow:hidden;background:var(--line);margin:6px 0 4px}
+.bar i{display:block;height:100%}
+.legend{display:flex;flex-wrap:wrap;gap:4px 12px;font-family:var(--display);font-size:12px;color:var(--muted)}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:4px;vertical-align:middle}
+.breakdown{font-family:var(--display);font-size:13.5px;width:100%}
+.breakdown td{padding:3px 0;border:0}
+.note{font-size:13.5px;color:var(--muted);font-family:var(--display)}
+.sources{font-family:var(--display);font-size:13.5px}
+.sources li{margin:.35em 0;word-break:break-word}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+<nav class="toc" aria-label="Sections">
+  <a href="#idea">The idea</a>
+  <a href="#why">Why it can win</a>
+  <a href="#landscape">Competition</a>
+  <a href="#lessons">Lessons from failures</a>
+  <a href="#product">Product</a>
+  <a href="#channels">Channels</a>
+  <a href="#categories">Where to start</a>
+  <a href="#arch">Architecture</a>
+  <a href="#money">Revenue</a>
+  <a href="#calc">City economics</a>
+  <a href="#risks">Risks</a>
+  <a href="#plan">Plan</a>
+  <a href="#sources">Sources</a>
+</nav>
+
+<main>
+<header class="hero">
+  <div class="eyebrow">zyyko.com · strategy blueprint · October 2026</div>
+  <h1>Ask once. <em>Local shops compete.</em> You pick.</h1>
+  <p class="lede">Zyyko connects Indian buyers with local businesses through AI. A person asks on WhatsApp, in ChatGPT, in Claude, or on zyyko.com: "Samsung 1.5 ton AC under ₹40k, installed this week, Indore." Zyyko sends the request to the matching nearby shops. They reply with a live price and availability in one tap, and the buyer gets the best three offers in minutes. The buyer pays with UPI inside WhatsApp, or books the service. The shop gets a real customer instead of a junk lead.</p>
+  <div class="meta">Follows on from the Saathi blueprint. Figures marked "reported" come from press coverage; everything in the calculator is an assumption to replace with pilot data.</div>
+  <div class="verdict"><span class="tag">Verdict</span>
+    <p><strong>This is a better business than an Instinct clone, and worth testing.</strong> You don't fight ChatGPT and Gemini. You supply them with the one thing they don't have: live local prices and stock from Indian shops, plus a way to order. Justdial shows local businesses will pay to reach buyers: <span class="num">₹1,214 Cr</span> FY26 revenue and <span class="num">6.39 lakh</span> paid campaigns (reported).</p>
+    <p><strong>The hard part isn't the AI.</strong> It's getting shops to respond quickly, one city and one category at a time. Prove that cheaply before building much.</p>
+  </div>
+</header>
+
+<section id="idea">
+  <h2>The idea in one picture</h2>
+  <p>Most local search tells you who exists. Zyyko tells you <strong>who has it, at what price, today</strong>. Shops compete for each request, which suits how Indians already shop: compare, bargain, pick the best deal.</p>
+  <div class="chat" aria-label="Example conversation">
+    <div class="phone">
+      <h4>Buyer on WhatsApp</h4>
+      <div class="msg me">🎤 Voice note: "Bhaiya, 1.5 ton inverter AC chahiye, 40 hazaar tak, Vijay Nagar, installation ke saath"</div>
+      <div class="msg bot">Got it: 1.5 ton inverter AC, up to ₹40,000, with installation, near Vijay Nagar. Asking 9 nearby dealers now. Offers in about 10 minutes.</div>
+      <div class="msg bot">Best 3 offers:
+        <span class="opt">1. Sharma Electronics · Voltas 5★ · ₹36,900 · install tomorrow · 1.2 km · ★4.6</span>
+        <span class="opt">2. Cool Point · LG 3★ · ₹34,500 · install Sat · 2.8 km · ★4.4</span>
+        <span class="opt">3. Croma Vijay Nagar · Samsung 3★ · ₹38,990 · today · 0.9 km</span>
+        <span class="btn">Pay ₹1,000 advance</span><span class="btn">Call shop</span><span class="btn">More options</span>
+      </div>
+    </div>
+    <div class="phone">
+      <h4>Shop owner on WhatsApp</h4>
+      <div class="msg v"><strong>New request · 1.2 km away</strong><br>1.5 ton inverter AC, budget ₹40,000, installation needed, this week.<span class="btn">Send price</span><span class="btn">Not available</span></div>
+      <div class="msg me">Voltas 5★ · ₹36,900 · install tomorrow</div>
+      <div class="msg v">✅ Customer chose you. Advance of ₹1,000 received via UPI. Customer: Rohit, Vijay Nagar. Zyyko fee: ₹49 (deducted).</div>
+    </div>
+  </div>
+  <p class="note">The shop-side reply uses a WhatsApp form (WhatsApp Flows), so a shopkeeper can answer in under 15 seconds. They can also reply with a voice note, which Zyyko turns into a structured offer.</p>
+</section>
+
+<section id="why">
+  <h2>Why this can beat ChatGPT, Google and Justdial</h2>
+  <div class="cards">
+    <div class="card"><h4>Live prices that AI doesn't have</h4><p>ChatGPT, Gemini and Google know online prices and listings. None of them knows what the dealer 1 km away will sell at today, or which plumber is free at 6 pm. Zyyko gets that by asking shops in real time.</p><span class="vs">vs ChatGPT / Gemini / Google AI Mode</span></div>
+    <div class="card"><h4>Be the supplier to every AI, not a rival</h4><p>Publish Zyyko as a ChatGPT app, a Claude connector and a custom MCP server for Grok. When someone asks any AI for a local deal, the AI calls Zyyko. You win wherever people search.</p><span class="vs">vs trying to out-chat the giants</span></div>
+    <div class="card"><h4>Shops pay only for real customers</h4><p>Justdial sells upfront packages and sends the same lead to many sellers, and owners complain about junk calls. Zyyko charges a small fee only when a buyer picks that shop, or a commission when they pay.</p><span class="vs">vs Justdial, IndiaMART</span></div>
+    <div class="card"><h4>Shops compete, so buyers save</h4><p>On appliances, furniture, hardware and services, local quotes often vary 10–20% (assumption to test). A clear "you saved ₹2,400" moment is what gets people to come back and share.</p><span class="vs">vs fixed-price apps</span></div>
+    <div class="card"><h4>Works with Meta's free shop bot</h4><p>Meta Business Agent (India, July 2026) gives each shop a free AI that replies to its own customers. It doesn't bring new buyers or compare shops. Zyyko sends demand, and their bot can handle the follow-up.</p><span class="vs">Complement, not rival</span></div>
+    <div class="card"><h4>WhatsApp-safe by design</h4><p>Zyyko is a marketplace where AI helps buyers find and order. That's commerce, which the WhatsApp Business rules allow. It isn't a general-purpose chatbot, which they ban. Keep it strictly about shopping and services.</p><span class="vs">vs the Instinct-style platform risk</span></div>
+  </div>
+</section>
+
+<section id="landscape">
+  <h2>Competition</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Player</th><th>What they do</th><th>Gap Zyyko fills</th><th>Threat</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Justdial</strong></td><td>Local listings and leads. ₹1,214 Cr FY26 revenue, 6.39 lakh paid campaigns. Adding AI voice and WhatsApp agents (reported)</td><td>No live prices; shops pay upfront for shared leads</td><td><span class="pill p-hi">High: incumbent adding AI</span></td></tr>
+      <tr><td><strong>Meta</strong> (WhatsApp, Business Agent, Meta AI)</td><td>Free AI agent per shop; WhatsApp Pay in chat</td><td>No comparison across shops or demand routing (yet)</td><td><span class="pill p-hi">High if they build discovery</span></td></tr>
+      <tr><td><strong>Google</strong> Maps and AI Mode (Hindi + 7 Indian languages)</td><td>Discovery, reviews, online shopping prices</td><td>No live local price or booking for small shops</td><td><span class="pill p-md">Medium</span></td></tr>
+      <tr><td><strong>ChatGPT / Claude / Gemini / Grok</strong></td><td>Answers; ChatGPT has 73M daily users in India; UPI agentic checkout pilots with BigBasket, Vi, Swiggy, Zomato</td><td>They need data and merchant partners, and Zyyko can be one</td><td><span class="pill p-lo">Channel more than rival</span></td></tr>
+      <tr><td><strong>Blinkit / Zepto / Swiggy Instamart</strong></td><td>10-minute delivery from their own dark stores, expanding to electronics and more</td><td>Fixed prices, no services, no local dealer offers or bargaining</td><td><span class="pill p-md">Medium on small items</span></td></tr>
+      <tr><td><strong>magicpin</strong></td><td>Offline-shop discovery and vouchers; largest food app on ONDC (~1.5 lakh orders/day reported)</td><td>Food-heavy; no request-for-quote model</td><td><span class="pill p-md">Medium</span></td></tr>
+      <tr><td><strong>Urban Company</strong></td><td>Standardised home services, high commission</td><td>Pricey; limited local choice</td><td><span class="pill p-md">Medium in services</span></td></tr>
+      <tr><td><strong>ChattyBao</strong></td><td>Local kirana ordering on WhatsApp ($5M seed)</td><td>Closest model; groceries, no comparison</td><td><span class="pill p-md">Medium: watch closely</span></td></tr>
+      <tr><td><strong>ONDC buyer apps</strong> (Paytm, magicpin and others)</td><td>Open network of 6+ lakh sellers in 600+ cities; buyer fee capped near 3%</td><td>Fragmented experience; a supply source for Zyyko</td><td><span class="pill p-lo">Partner</span></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="lessons">
+  <h2>Lessons from those who failed</h2>
+  <ul>
+    <li><strong>PhonePe Pincode</strong> spent about ₹90 Cr on an ONDC local-shopping app and wound it down in Dec 2025. Buyer discounts cost more than the low seller fees brought in. <em>Lesson: don't buy growth with discounts. Savings should come from shops competing, not from your wallet.</em></li>
+    <li><strong>Lookup</strong> (Khosla-backed, 2015–16) let people chat with local shops through human operators. It was sold to NowFloats. <em>Lesson: people-run chat commerce costs too much per request. AI now brings that cost to a few rupees, which is why this can work in 2026.</em></li>
+    <li><strong>Dunzo</strong> ran "anything delivered" and collapsed under logistics costs. <em>Lesson: don't own delivery. Shops deliver, the buyer picks up, or you use partners like Porter, Shadowfax or ONDC logistics.</em></li>
+    <li><strong>Justdial's complaints</strong>: shops pay upfront for leads shared with competitors. <em>Lesson: charge for outcomes, and send each request only to a few well-rated shops.</em></li>
+  </ul>
+</section>
+
+<section id="product">
+  <h2>Product</h2>
+  <h3>For buyers (free)</h3>
+  <ul>
+    <li>Ask by voice note or text in Hindi, English or another Indian language, on WhatsApp, ChatGPT, Claude or zyyko.com.</li>
+    <li>Get the top 3 live offers with price, distance, rating and delivery or install time.</li>
+    <li>Pay in chat with WhatsApp Pay (UPI, cards, other UPI apps through Razorpay or PayU), pay an advance, or pay at the shop.</li>
+    <li>Track the order, rate the shop, and use one "Zyyko guarantee" number if something goes wrong.</li>
+  </ul>
+  <h3>For shops</h3>
+  <ul>
+    <li><strong>2-minute sign-up on WhatsApp:</strong> send a shop photo, location and what you sell. AI builds the profile and catalogue from photos and voice.</li>
+    <li><strong>Free:</strong> receive matching requests and reply with a price in one tap.</li>
+    <li><strong>Pay only on success:</strong> a fee per chosen offer, or a commission on paid orders.</li>
+    <li><strong>Zyyko Pro (paid):</strong> see more requests, a price-insight dashboard ("your AC price is 6% above the area average"), catalogue sync, and repeat-customer messages.</li>
+  </ul>
+  <h3>For AI platforms and apps</h3>
+  <ul>
+    <li>A Zyyko server exposing three tools: <span class="num">search_local_offers</span>, <span class="num">request_quotes</span> and <span class="num">place_order</span>. It's listed in the ChatGPT app directory and the Claude connectors directory, and Grok users can add it as a custom MCP server.</li>
+    <li>Later: a "Zyyko API" that other apps (banks, telcos, super-apps) pay for per order.</li>
+  </ul>
+</section>
+
+<section id="channels">
+  <h2>Channels: be everywhere people ask</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Channel</th><th>How</th><th>Self-serve?</th><th>Priority</th></tr></thead>
+    <tbody>
+      <tr><td><strong>WhatsApp</strong></td><td>Cloud API number; WhatsApp Flows for forms; WhatsApp Pay (Razorpay/PayU) for in-chat checkout; order-status messages. Utility templates cost ₹0.115, and replies inside a buyer-started chat are free.</td><td>Yes</td><td><span class="pill p-lo">1: core</span></td></tr>
+      <tr><td><strong>zyyko.com</strong></td><td>One page per city, category and product, built automatically, with structured data (LocalBusiness and Offer schema) so Google, AI Mode and AI answer engines cite it. Includes a "Zyyko price index" by city.</td><td>Yes</td><td><span class="pill p-lo">1</span></td></tr>
+      <tr><td><strong>ChatGPT</strong></td><td>Build an app with the Apps SDK and submit it to the app directory. Use agentic UPI checkout (Razorpay/NPCI, Cashfree) when it's available to us.</td><td>Yes (review)</td><td><span class="pill p-lo">2</span></td></tr>
+      <tr><td><strong>Claude</strong></td><td>Remote MCP connector submitted to the Connectors Directory (1,600+ listed).</td><td>Yes (review)</td><td><span class="pill p-lo">2</span></td></tr>
+      <tr><td><strong>Grok</strong></td><td>Users can add custom MCP servers, so publish the URL and instructions.</td><td>Yes</td><td><span class="pill p-md">3</span></td></tr>
+      <tr><td><strong>Gemini app</strong></td><td>Consumer connected apps are partnership-only (about 35, invite-based). Reach Gemini users through Google Search and AI Mode via zyyko.com instead.</td><td>No</td><td><span class="pill p-md">3 (indirect)</span></td></tr>
+      <tr><td><strong>ONDC</strong></td><td>Register as a buyer app to reach ONDC sellers in categories you don't sign up yourself. Earn the buyer fee (~3%) and order-volume incentives.</td><td>Yes (certification)</td><td><span class="pill p-md">Phase 2</span></td></tr>
+      <tr><td><strong>Offline</strong></td><td>QR stickers at partner shops ("Get the best price on Zyyko"); every signed-up shop brings its own customers.</td><td>Yes</td><td><span class="pill p-lo">1</span></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="categories">
+  <h2>Where to start: one city, two categories</h2>
+  <p>A marketplace only works when a buyer reliably gets good offers fast. That takes enough shops in each category and area. Start narrow and dense.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Category</th><th>Price spread</th><th>Ticket</th><th>Frequency</th><th>How we earn</th><th>Fit</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Appliances and electronics</strong> (AC, fridge, TV, mobiles)</td><td>High</td><td class="num">₹10k–60k</td><td>Low</td><td>2–4% commission or ₹49–149 per chosen offer</td><td><span class="pill p-lo">Start</span></td></tr>
+      <tr><td><strong>Home services</strong> (AC service, plumber, electrician, painting, pest control)</td><td>High</td><td class="num">₹300–15k</td><td>High</td><td>₹29–99 per chosen offer</td><td><span class="pill p-lo">Start</span></td></tr>
+      <tr><td>Furniture and furnishings</td><td>Very high</td><td class="num">₹5k–1L</td><td>Low</td><td>3–6% commission</td><td><span class="pill p-md">Phase 2</span></td></tr>
+      <tr><td>Hardware and building materials</td><td>High</td><td class="num">₹2k–5L</td><td>Medium</td><td>Per-order fee; contractor leads</td><td><span class="pill p-md">Phase 2</span></td></tr>
+      <tr><td>Auto service and spare parts</td><td>High</td><td class="num">₹500–20k</td><td>Medium</td><td>Per chosen offer</td><td><span class="pill p-md">Phase 2</span></td></tr>
+      <tr><td>Events (caterers, decorators, tent, photographers)</td><td>Very high</td><td class="num">₹10k–5L</td><td>Low</td><td>₹199–999 per chosen offer</td><td><span class="pill p-md">Phase 2</span></td></tr>
+      <tr><td>Groceries</td><td>Low</td><td class="num">₹300–1.5k</td><td>Very high</td><td>Thin; quick commerce dominates</td><td><span class="pill p-hi">Avoid early</span></td></tr>
+      <tr><td>Medicines</td><td>Medium</td><td class="num">₹200–3k</td><td>High</td><td>Regulated (prescriptions, online pharmacy rules)</td><td><span class="pill p-hi">Avoid early</span></td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>City choice:</strong> a Tier-2 city you know well (for example Indore, Jaipur, Lucknow or Surat), where buyers bargain, local dealers are strong and Urban Company is thin. Aim for 300–500 active shops in the two categories before opening to the public.</p>
+</section>
+
+<section id="arch">
+  <h2>Architecture</h2>
+<pre class="mermaid">
+flowchart LR
+  subgraph Buyers
+    W["WhatsApp<br/>voice / text"]
+    C["ChatGPT app"]
+    K["Claude connector"]
+    G["Grok custom MCP"]
+    S["zyyko.com<br/>+ Google / AI Mode"]
+  end
+  W --> Z
+  C --> Z
+  K --> Z
+  G --> Z
+  S --> Z
+  Z["Zyyko core API / MCP server<br/>Indic intent parsing, category schema"] --> M["Match shops<br/>distance, category, rating, response speed"]
+  M --> Q["Send request to 5-10 shops<br/>WhatsApp Flows"]
+  Q --> V["Shops reply<br/>price, stock, time"]
+  V --> R["Rank top 3<br/>price, trust, ETA"]
+  R --> P["Pay<br/>WhatsApp Pay / UPI / at shop"]
+  P --> F["Fulfil and track<br/>shop delivery, pickup, partner"]
+  F --> D["Reviews + live price index<br/>the moat"]
+  D --> M
+  O["ONDC network"] -.-> M
+</pre>
+  <p class="note">Model use: a small, cheap model for parsing requests and voice notes, and a stronger one only to compare offers and handle messy requests. Most cost is WhatsApp templates (₹0.115 each to shops) and a few rupees of AI per request.</p>
+</section>
+
+<section id="money">
+  <h2>How Zyyko makes money</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Stream</th><th>Who pays</th><th>Price (proposal)</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Fee per chosen offer</strong></td><td>Shop</td><td class="num">₹29–149 by category</td><td>Charged only when the buyer picks that shop. Easy for shops to accept, and the opposite of Justdial's upfront packages.</td></tr>
+      <tr><td><strong>Commission on paid orders</strong></td><td>Shop</td><td class="num">2–6%</td><td>When payment goes through Zyyko via split settlement. Well under the 15–25% big marketplaces charge.</td></tr>
+      <tr><td><strong>Zyyko Pro</strong></td><td>Shop</td><td class="num">₹499–1,999/mo</td><td>More requests, price insights, catalogue sync, repeat-customer messages.</td></tr>
+      <tr><td><strong>Sponsored slot</strong></td><td>Shop</td><td>Per view or click</td><td>Later, always labelled "Sponsored" and never placed above a cheaper real offer.</td></tr>
+      <tr><td><strong>ONDC buyer fee + incentives</strong></td><td>Network / seller</td><td class="num">~3%</td><td>For ONDC-sourced orders.</td></tr>
+      <tr><td><strong>API / white-label</strong></td><td>Apps, banks, telcos</td><td>Per order</td><td>Once the shop network is dense.</td></tr>
+      <tr><td><strong>Shop credit (later)</strong></td><td>NBFC partner</td><td>Referral share</td><td>Order data shows shop health. Only with a licensed lender.</td></tr>
+    </tbody>
+  </table></div>
+  <p>Buyers stay free. No buyer discounts funded by Zyyko. Shops can fund their own offers if they want to.</p>
+</section>
+
+<section id="calc">
+  <h2>City economics calculator</h2>
+  <p>Monthly numbers for one city, in rupees. All are assumptions; replace them with pilot data. The presets show a pilot city losing money, as expected, and the request volume a mature city needs to make money.</p>
+  <div class="calc">
+    <div class="presets" role="group" aria-label="Scenario presets">
+      <button type="button" data-preset="pilot" aria-pressed="true">Pilot city (month 3)</button>
+      <button type="button" data-preset="mature" aria-pressed="false">Mature city (month 15)</button>
+      <button type="button" data-preset="services" aria-pressed="false">Services only</button>
+    </div>
+    <div class="calc-grid">
+      <div id="inputs"></div>
+      <div class="out" aria-live="polite">
+        <div class="big" id="o-ebitda"><b>—</b><span>City profit / loss per month (after team and marketing)</span></div>
+        <div class="big" id="o-contrib"><b>—</b><span>Contribution per month (before team and marketing)</span></div>
+        <div class="big"><b id="o-breakeven">—</b><span>Requests per month needed to break even</span></div>
+        <div>
+          <div class="note">Revenue mix</div>
+          <div class="bar" id="bar-rev"></div>
+          <div class="legend" id="leg-rev"></div>
+        </div>
+        <table class="breakdown"><tbody id="o-totals"></tbody></table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="risks">
+  <h2>Risks</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Risk</th><th>Level</th><th>What to do</th></tr></thead>
+    <tbody>
+      <tr><td>Shops don't reply fast enough, so buyers get no offers</td><td><span class="pill p-hi">High</span></td><td>Start dense in one city with field onboarding. Rank shops by response speed. Show "2 offers so far" while waiting. Ops staff call shops to fill gaps in the pilot.</td></tr>
+      <tr><td>Meta adds cross-shop discovery inside WhatsApp</td><td><span class="pill p-hi">High</span></td><td>Be on every AI channel and the web, own the shop relationships and price data, and focus on high-ticket bargaining categories Meta won't run by hand.</td></tr>
+      <tr><td>Justdial copies the request-for-quote model</td><td><span class="pill p-md">Medium</span></td><td>Its revenue depends on upfront packages, so outcome pricing undercuts its model. Move faster in your chosen categories.</td></tr>
+      <tr><td>Fake prices, bait-and-switch, poor service</td><td><span class="pill p-md">Medium</span></td><td>Verified shops (GST or Udyam, photo and location check). Offers are binding for 24 hours. Ratings and response scores. An advance through Zyyko holds the shop to the deal. A guarantee helpline.</td></tr>
+      <tr><td>Legal: Consumer Protection (E-Commerce) Rules, GST tax collection when Zyyko collects payments, DPDP</td><td><span class="pill p-md">Medium</span></td><td>Show seller details, appoint a grievance officer, no hidden ranking. Start with "pay the shop directly" plus a fee, then add split settlement with a payment aggregator once the GST setup is done. Build privacy compliance in from the start.</td></tr>
+      <tr><td>WhatsApp policy</td><td><span class="pill p-lo">Low–medium</span></td><td>Stay strictly commerce (discovery, offers, orders, payments). No general chat. Use approved templates and opt-ins.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="plan">
+  <h2>Plan</h2>
+  <h3>Phase 0: prove it by hand (6 weeks, about ₹4–6 lakh)</h3>
+  <ol>
+    <li>One city and two categories (appliances and home services). Sign up 300 shops by visiting them.</li>
+    <li>A WhatsApp Business number with AI help. Ops staff send requests to shops and gather offers, partly by hand.</li>
+    <li>Get buyers through local Click-to-WhatsApp ads, society WhatsApp groups and shop QR codes. Target 1,000 requests.</li>
+  </ol>
+  <div class="callout"><span class="tag">Go / no-go</span>
+    Continue only if: <strong>60%+</strong> of requests get 2 or more offers within 30 minutes · <strong>25%+</strong> of requests end in a purchase or booking · buyers save <strong>8%+</strong> against the online or first price on appliances · <strong>50%+</strong> of shops that won a customer agree to pay the per-offer fee · <strong>30%+</strong> of buyers come back within 60 days.
+  </div>
+  <h3>Phase 1: build the product (months 2–6)</h3>
+  <ul>
+    <li>WhatsApp Flows for shop replies, WhatsApp Pay checkout, order tracking, ratings.</li>
+    <li>The Zyyko MCP server, ChatGPT app and Claude connector, plus automated pages on zyyko.com.</li>
+    <li>Shop dashboard and Zyyko Pro; turn on fees.</li>
+  </ul>
+  <h3>Phase 2: expand (months 6–18)</h3>
+  <ul>
+    <li>Add furniture, hardware, auto and events. Open 3–5 cities using the same playbook.</li>
+    <li>ONDC buyer-app registration; delivery partners; API for other apps.</li>
+    <li>Raise a seed round on real numbers: requests, offer speed, conversion and shop revenue.</li>
+  </ul>
+</section>
+
+<section id="sources">
+  <h2>Sources</h2>
+  <p class="note">Gathered from search-result summaries; check key figures against the originals before using them in a pitch.</p>
+  <ul class="sources">
+    <li><a href="https://www.businesstoday.in/amp/markets/stocks/story/just-dial-shares-jump-nearly-15-on-q1-fy27-earnings-details-here-542458-2026-07-13">Business Today: Justdial Q1 FY27</a> · <a href="https://www.kalkine.co.in/article/technology/what-were-the-key-highlights-of-just-dials-q1-fy27-results">Kalkine: Justdial Q1 FY27 highlights</a></li>
+    <li><a href="https://www.outlookbusiness.com/economy-and-policy/magicpin-records-15-times-growth-on-ondc-receives-15-lakh-orders-per-day">Outlook Business: magicpin 1.5 lakh orders/day on ONDC</a></li>
+    <li><a href="https://ecorpit.com/ondc-2026-d2c-brand-seller-scale-playbook/">ONDC in 2026: sellers, cities, fees</a> · <a href="https://inc42.com/?p=418413">Inc42: ONDC buyer-app incentives</a></li>
+    <li><a href="https://techcrunch.com/2025/12/05/walmart-backed-phonepe-winds-down-its-pincode-app-in-yet-another-e-commerce-step-back/">TechCrunch: PhonePe winds down Pincode</a> · <a href="https://inc42.com/?p=541012">Inc42: Pincode moves to B2B</a></li>
+    <li><a href="https://www.indiatvnews.com/technology/news/whatsapp-launches-meta-business-agent-in-india-ai-assistant-to-help-businesses-automate-customer-support-2026-07-08-1047580">India TV: Meta Business Agent launches in India</a> · <a href="https://hyperleap.ai/blog/meta-business-agent-india-launch-what-it-means">Hyperleap: what it means</a></li>
+    <li><a href="https://m.aisensy.com/blog/whatsapp-payments-guide/">AiSensy: WhatsApp Payments for businesses 2026</a> · <a href="https://razorpay.com/blog/razorpay-payments-on-whatsapp-business/">Razorpay: payments on WhatsApp Business</a></li>
+    <li><a href="https://baat.ai/blog/whatsapp-api-pricing-india">WhatsApp API pricing in India 2026</a> · <a href="https://respond.io/blog/whatsapp-general-purpose-chatbots-ban">respond.io: what the WhatsApp AI ban covers</a></li>
+    <li><a href="https://openai.com/blog/introducing-apps-in-chatgpt">OpenAI: apps in ChatGPT</a> · <a href="https://help.openai.com/en/articles/12515353-build-with-the-apps-sdk">OpenAI: build with the Apps SDK</a></li>
+    <li><a href="https://techcrunch.com/2025/10/09/india-pilots-ai-chatbot-led-e-commerce-with-chatgpt-gemini-claude-in-the-mix">TechCrunch: India pilots AI-chatbot commerce</a> · <a href="https://www.storyboard18.com/digital/cashfree-launches-in-chat-payments-for-ai-apps-in-partnership-with-mastercard-and-swiggy-89906.htm">Storyboard18: Cashfree in-chat payments for AI apps</a> · <a href="https://razorpay.com/blog/agentic-payments-and-npci/">Razorpay: agentic UPI</a></li>
+    <li><a href="https://claude.com/docs/connectors/directory">Claude Connectors Directory</a> · <a href="https://docs.x.ai//grok/connectors">Grok connectors</a> · <a href="https://tallyfy.com/how-to-list-mcp-server-google-gemini/">Listing an MCP server with Gemini</a></li>
+    <li><a href="https://yourstory.com/ai-story/google-ai-mode-search-live-india">YourStory: Google AI Mode in Hindi</a> · <a href="https://blog.google/intl/en-in/products/explore-communicate/new-ways-google-is-using-ai-to-make-shopping-easier/">Google India: AI shopping</a></li>
+    <li><a href="https://inc42.com/?p=331298">Inc42: ChattyBao raises $5M</a> · <a href="https://techcrunch.com/2016/07/18/khosla-backed-lookup-acquired-by-business-discovery-service-nowfloats/">TechCrunch: Lookup acquired by NowFloats</a></li>
+  </ul>
+</section>
+</main>
+</div>
+
+<script>
+(function(){
+  const FIELDS = [
+    {g:"Demand", k:"requests", l:"Buyer requests / month", step:500},
+    {g:"Demand", k:"conv", l:"Requests that end in a purchase (%)", step:1},
+    {g:"Demand", k:"prodShare", l:"Purchases that are products (%)", step:5},
+    {g:"Demand", k:"aov", l:"Average product order (₹)", step:500},
+    {g:"Demand", k:"paidVia", l:"Product orders paid via Zyyko (%)", step:5},
+    {g:"Pricing", k:"take", l:"Commission on paid product orders (%)", step:0.5},
+    {g:"Pricing", k:"offerFeeP", l:"Fee per chosen offer, product, if not paid via Zyyko (₹)", step:10},
+    {g:"Pricing", k:"offerFeeS", l:"Fee per chosen offer, service (₹)", step:5},
+    {g:"Shops", k:"shops", l:"Active shops", step:50},
+    {g:"Shops", k:"proPct", l:"Shops on Zyyko Pro (%)", step:1},
+    {g:"Shops", k:"proPrice", l:"Zyyko Pro price (₹/mo)", step:50},
+    {g:"Variable costs", k:"pings", l:"Shops pinged per request", step:1},
+    {g:"Variable costs", k:"tpl", l:"WhatsApp template cost (₹)", step:0.01},
+    {g:"Variable costs", k:"ai", l:"AI + infra per request (₹)", step:0.5},
+    {g:"Variable costs", k:"humanPct", l:"Requests needing a human (%)", step:1},
+    {g:"Variable costs", k:"humanCost", l:"Cost per human touch (₹)", step:5},
+    {g:"Variable costs", k:"pg", l:"Payment cost on paid GMV (%)", step:0.1},
+    {g:"Fixed costs", k:"team", l:"City team (₹/mo)", step:25000},
+    {g:"Fixed costs", k:"newBuyers", l:"New buyers acquired / month", step:500},
+    {g:"Fixed costs", k:"cac", l:"Cost per new buyer (₹)", step:10},
+  ];
+  const PRESETS = {
+    pilot:{requests:3000,conv:20,prodShare:40,aov:15000,paidVia:20,take:3,offerFeeP:99,offerFeeS:49,shops:400,proPct:0,proPrice:799,pings:7,tpl:0.115,ai:4,humanPct:30,humanCost:30,pg:0.5,team:350000,newBuyers:2000,cac:80},
+    mature:{requests:50000,conv:28,prodShare:35,aov:15000,paidVia:50,take:3,offerFeeP:99,offerFeeS:49,shops:3000,proPct:12,proPrice:799,pings:6,tpl:0.115,ai:3,humanPct:6,humanCost:30,pg:0.5,team:900000,newBuyers:6000,cac:90},
+    services:{requests:25000,conv:30,prodShare:0,aov:0,paidVia:0,take:0,offerFeeP:0,offerFeeS:59,shops:1500,proPct:10,proPrice:599,pings:5,tpl:0.115,ai:3,humanPct:8,humanCost:30,pg:0,team:600000,newBuyers:5000,cac:70},
+  };
+  let S = Object.assign({}, PRESETS.pilot);
+  try{ const saved = JSON.parse(localStorage.getItem("zyyko-calc")||"null"); if(saved) S = Object.assign(S, saved); }catch(e){}
+
+  const inputs = document.getElementById("inputs");
+  let html="", group="";
+  FIELDS.forEach(f=>{
+    if(f.g!==group){ if(group) html+="</fieldset>"; html+=`<fieldset><legend>${f.g}</legend>`; group=f.g; }
+    html+=`<label class="field" for="in-${f.k}"><span>${f.l}</span><input id="in-${f.k}" type="number" min="0" step="${f.step}" data-k="${f.k}"></label>`;
+  });
+  inputs.innerHTML = html+"</fieldset>";
+
+  const big = n => { const a=Math.abs(n), s=n<0?"−":""; if(a>=1e7) return s+"₹"+(a/1e7).toFixed(2)+" Cr"; if(a>=1e5) return s+"₹"+(a/1e5).toFixed(1)+" L"; return s+"₹"+Math.round(a).toLocaleString("en-IN"); };
+  const fill = () => FIELDS.forEach(f=>{ document.getElementById("in-"+f.k).value = S[f.k]; });
+
+  // Per-request economics are linear in request volume, so break-even is a closed form.
+  function perRequest(){
+    const purch = S.conv/100, prod = purch*S.prodShare/100, serv = purch-prod;
+    const paid = prod*S.paidVia/100, unpaid = prod-paid;
+    const commission = paid*S.aov*S.take/100;
+    const offerFees = unpaid*S.offerFeeP + serv*S.offerFeeS;
+    const varCost = S.pings*S.tpl + S.ai + S.humanPct/100*S.humanCost + paid*S.aov*S.pg/100;
+    return {commission, offerFees, varCost, gmv: prod*S.aov};
+  }
+  function render(){
+    const u = perRequest(), n = S.requests;
+    const pro = S.shops*S.proPct/100*S.proPrice;
+    const commission = u.commission*n, offer = u.offerFees*n;
+    const rev = commission+offer+pro, vc = u.varCost*n;
+    const contrib = rev-vc, mkt = S.newBuyers*S.cac, ebitda = contrib-S.team-mkt;
+    const unit = u.commission+u.offerFees-u.varCost;
+    const be = unit>0 ? Math.ceil((S.team+mkt-pro)/unit) : Infinity;
+    const e = document.getElementById("o-ebitda"); e.className="big "+(ebitda>=0?"pos":"neg"); e.querySelector("b").textContent = big(ebitda);
+    const c = document.getElementById("o-contrib"); c.className="big "+(contrib>=0?"pos":"neg"); c.querySelector("b").textContent = big(contrib);
+    document.getElementById("o-breakeven").textContent = isFinite(be) ? Math.max(0,be).toLocaleString("en-IN") : "Not reachable";
+    const css = getComputedStyle(document.documentElement);
+    const parts = [{n:"Commission",v:commission,c:css.getPropertyValue("--accent").trim()},{n:"Offer fees",v:offer,c:css.getPropertyValue("--chili").trim()},{n:"Zyyko Pro",v:pro,c:css.getPropertyValue("--good").trim()}];
+    const tot = parts.reduce((a,p)=>a+p.v,0)||1;
+    document.getElementById("bar-rev").innerHTML = parts.map(p=>`<i style="width:${(p.v/tot*100).toFixed(2)}%;background:${p.c}"></i>`).join("");
+    document.getElementById("leg-rev").innerHTML = parts.map(p=>`<span><i style="background:${p.c}"></i>${p.n} ${Math.round(p.v/tot*100)}%</span>`).join("");
+    const rows = [
+      ["Purchases / month", Math.round(n*S.conv/100).toLocaleString("en-IN")],
+      ["Product GMV / month", big(u.gmv*n)],
+      ["Revenue / month", big(rev)],
+      ["Variable cost / month", big(vc)],
+      ["Revenue per request", "₹"+(rev/(n||1)).toFixed(1)],
+      ["Variable cost per request", "₹"+u.varCost.toFixed(1)],
+      ["City team + marketing", big(S.team+mkt)],
+    ];
+    document.getElementById("o-totals").innerHTML = rows.map(([a,b])=>`<tr><td>${a}</td><td class="r num">${b}</td></tr>`).join("");
+    try{ localStorage.setItem("zyyko-calc", JSON.stringify(S)); }catch(e){}
+  }
+  inputs.addEventListener("input", e=>{
+    const k=e.target.dataset.k; if(!k) return;
+    const v=parseFloat(e.target.value); S[k]=isNaN(v)?0:v;
+    document.querySelectorAll(".presets button").forEach(b=>b.setAttribute("aria-pressed","false"));
+    render();
+  });
+  document.querySelectorAll(".presets button").forEach(b=>b.addEventListener("click",()=>{
+    S = Object.assign({}, PRESETS[b.dataset.preset]);
+    document.querySelectorAll(".presets button").forEach(x=>x.setAttribute("aria-pressed", String(x===b)));
+    fill(); render();
+  }));
+  fill(); render();
+  if(window.matchMedia) window.matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", render);
+})();
+</script>
